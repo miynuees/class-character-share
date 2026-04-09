@@ -1,0 +1,3146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>우리 반 캐릭터 키우기 🌱</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;700&display=swap');
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --primary: #4FB585;          /* 연두 그린 (더 진하게) */
+  --primary-light: #7DD5A8;    /* 라이트 민트 */
+  --primary-dark: #3A9B6E;     /* 더 진한 그린 */
+  --accent: #FFD4A3;           /* 따뜻한 크림 */
+  --accent2: #FFA5AB;          /* 코랄 핑크 */
+  --bg: #F4FBF7;               /* 아주 연한 민트 배경 */
+  --text: #2C3835;             /* 진한 다크 (가독성 ↑) */
+  --text-light: #5A6B62;       /* 미디엄 (가독성 ↑) */
+  --success: #4FB585;
+  --shadow: 0 4px 20px rgba(79, 181, 133, 0.22);
+}
+
+body {
+  font-family: 'Noto Sans KR', sans-serif;
+  background: linear-gradient(135deg, #F4FBF7 0%, #FFF9F0 100%);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+.header {
+  background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+  color: white;
+  padding: 14px 20px;
+  text-align: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(58, 155, 110, 0.35);
+}
+
+.header h1 {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 2px;
+}
+
+.header p { font-size: 0.78rem; opacity: 0.9; }
+
+.header-buttons {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 10px;
+}
+
+.header-btn {
+  background: rgba(255,255,255,0.2);
+  border: 2px solid rgba(255,255,255,0.4);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.header-btn:hover {
+  background: rgba(255,255,255,0.35);
+  transform: scale(1.08);
+}
+
+/* Hide tab navigation - we use header button instead */
+.tab-nav { display: none; }
+
+.tab-nav {
+  display: flex;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  position: sticky;
+  top: 60px;
+  z-index: 99;
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 14px 8px;
+  border: none;
+  background: white;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text-light);
+  cursor: pointer;
+  transition: all 0.3s;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: #E8F5EE;
+}
+
+.tab-content { display: none; padding: 16px; max-width: 1400px; margin: 0 auto; }
+.tab-content.active { display: block; }
+
+/* ===== DASHBOARD LAYOUT: top row 2-col (character | praise), bottom row full-width history ===== */
+.dashboard {
+  display: grid;
+  grid-template-columns: minmax(440px, 1.3fr) minmax(340px, 1fr);
+  grid-template-areas:
+    "character praise"
+    "history   history";
+  gap: 18px;
+}
+
+.col-character { grid-area: character; }
+.col-praise { grid-area: praise; }
+.col-history { grid-area: history; }
+
+.dash-col {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Character zone - horizontal flex with stats beside */
+.col-character { display: flex; }
+
+.col-character .character-zone {
+  padding: 18px 20px;
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+}
+
+.col-character .character-zone::before {
+  height: 100%;
+  background: linear-gradient(160deg, #E8F5EE 0%, #D9F0E1 50%, #FFF4D6 100%);
+  opacity: 0.7;
+}
+
+.char-main {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.col-character .character-display {
+  width: 270px;
+  height: 270px;
+  margin: 0 auto 4px;
+}
+
+.col-character .character-name {
+  font-size: 1.45rem;
+  margin: 14px 0 6px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.col-character .character-title {
+  font-size: 0.82rem;
+  margin-bottom: 18px;
+  color: #4A5C53;
+  font-weight: 600;
+}
+
+.col-character .collection-info {
+  margin: 0;
+  font-size: 0.78rem;
+  padding: 8px 4px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #FFF9E6, #FFEDB3);
+  border: 1px solid #FFD700;
+  border-radius: 14px;
+  color: #B8860B;
+  font-weight: 800;
+  font-family: 'Jua', sans-serif;
+}
+
+.col-character .level-info {
+  margin-bottom: 12px;
+  gap: 14px;
+}
+
+.col-character .level-badge {
+  font-size: 1.05rem;
+  padding: 5px 16px;
+}
+
+.col-character .total-points {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.col-character .total-points span {
+  color: var(--primary-dark);
+  font-weight: 700;
+}
+
+.col-character .exp-bar-container {
+  width: 80%;
+  height: 18px;
+  margin: 0 auto;
+}
+
+.col-character .exp-text {
+  font-size: 0.78rem;
+  color: #4A5C53;
+  font-weight: 600;
+  margin-top: 6px;
+}
+
+.col-character .character-stage {
+  color: var(--primary-dark);
+  font-weight: 800;
+}
+
+/* Vertical stats column beside character */
+.char-stats-vertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 88px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.char-stats-vertical .stat-card {
+  padding: 16px 6px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #E8F5EE;
+}
+
+.char-stats-vertical .stat-card .icon { font-size: 1.5rem; margin-bottom: 6px; }
+.char-stats-vertical .stat-card .value { font-size: 1.4rem; line-height: 1; }
+.char-stats-vertical .stat-card .label { font-size: 0.72rem; margin-top: 4px; }
+
+/* Praise form - right column full height */
+.col-praise { display: flex; }
+
+.col-praise .praise-form {
+  padding: 18px 20px;
+  margin-bottom: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.col-praise .praise-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #E8F5EE;
+}
+
+.col-praise .praise-header h3 {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.15rem;
+  color: var(--primary);
+  margin: 0;
+  white-space: nowrap;
+}
+
+.col-praise .praise-header .subtitle {
+  font-size: 0.76rem;
+  color: var(--text-light);
+  margin: 0 0 0 auto;
+  padding: 0;
+  border: none;
+  text-align: right;
+}
+
+.col-praise .form-group { margin-bottom: 12px; }
+
+.col-praise .form-group label {
+  font-size: 0.78rem;
+  margin-bottom: 6px;
+}
+
+/* Square cute quick praise buttons in grid */
+.col-praise .quick-praise {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(82px, 1fr));
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.col-praise .quick-btn {
+  aspect-ratio: 1;
+  padding: 10px 4px;
+  border-width: 2px;
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  line-height: 1;
+}
+
+.col-praise .quick-btn .qb-emoji {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.col-praise .quick-btn .qb-text {
+  font-size: 0.68rem;
+  line-height: 1.25;
+  text-align: center;
+  font-weight: 700;
+}
+
+.col-praise .form-group input[type="text"] {
+  padding: 8px 12px;
+  font-size: 0.82rem;
+}
+
+/* Form row: points + signature side by side */
+.col-praise .form-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 12px;
+  margin-top: 18px;
+  margin-bottom: 14px;
+}
+
+.col-praise .form-row .form-group { margin-bottom: 0; }
+
+.col-praise .points-group .points-select {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.col-praise .point-chip {
+  padding: 12px 4px;
+  font-size: 1.05rem;
+  border-radius: 16px;
+  border-width: 2.5px;
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  font-family: 'Jua', sans-serif;
+  opacity: 0.55;
+  filter: saturate(0.7);
+}
+
+.col-praise .point-chip:nth-child(1) {
+  background: linear-gradient(135deg, #E3F2FD, #BBDEFB);
+  color: #1976D2;
+  border-color: #90CAF9;
+}
+.col-praise .point-chip:nth-child(2) {
+  background: linear-gradient(135deg, #E8F5E9, #C8E6C9);
+  color: #388E3C;
+  border-color: #A5D6A7;
+}
+.col-praise .point-chip:nth-child(3) {
+  background: linear-gradient(135deg, #FFF9E6, #FFECB3);
+  color: #F57C00;
+  border-color: #FFD54F;
+}
+.col-praise .point-chip:nth-child(4) {
+  background: linear-gradient(135deg, #FCE4EC, #F8BBD0);
+  color: #C2185B;
+  border-color: #F48FB1;
+}
+
+.col-praise .point-chip:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  opacity: 0.85;
+}
+
+.col-praise .point-chip.selected {
+  opacity: 1;
+  filter: saturate(1.2);
+  transform: scale(1.15) translateY(-2px);
+  box-shadow: 0 8px 20px rgba(79, 181, 133, 0.5), 0 0 0 4px rgba(168, 230, 195, 0.5);
+  border-width: 3px;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary)) !important;
+  color: white !important;
+  border-color: var(--primary-dark) !important;
+  z-index: 1;
+}
+
+.col-praise .point-chip.selected::before {
+  content: '✓';
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: white;
+  color: var(--primary-dark);
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  font-weight: 900;
+  border: 2.5px solid var(--primary);
+  box-shadow: 0 2px 6px rgba(79, 181, 133, 0.4);
+}
+
+.col-praise .point-chip.selected::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  z-index: -1;
+  opacity: 0.3;
+  animation: pulse 1.8s infinite;
+}
+
+.col-praise .signature-group .signature-area {
+  padding: 5px;
+}
+
+.col-praise .signature-canvas {
+  height: 75px;
+}
+
+.col-praise .signature-group .signature-controls {
+  margin-top: 4px;
+  justify-content: flex-end;
+  padding: 0;
+}
+
+.col-praise .signature-group .signature-hint { display: none; }
+
+.col-praise .signature-group .clear-sig-btn {
+  padding: 3px 10px;
+  font-size: 0.7rem;
+}
+
+.col-praise .submit-btn {
+  padding: 14px;
+  font-size: 1.1rem;
+  margin-top: auto;
+}
+
+/* History panel - full width bottom */
+.col-history { display: flex; }
+
+.history-panel {
+  background: white;
+  border-radius: 20px;
+  padding: 22px 26px;
+  box-shadow: var(--shadow);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.history-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid #E8F5EE;
+}
+
+.history-header h3 {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.15rem;
+  color: var(--primary);
+}
+
+.stat-btn {
+  background: #E8F5EE;
+  color: var(--primary);
+  border: none;
+  padding: 7px 14px;
+  border-radius: 16px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s;
+}
+
+.stat-btn:hover { background: #D9F0E1; transform: translateY(-1px); }
+
+/* Wide history: grid of items in 2-3 columns */
+.scrollable-history {
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 6px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.scrollable-history::-webkit-scrollbar { width: 6px; }
+.scrollable-history::-webkit-scrollbar-track { background: #F4FBF7; border-radius: 3px; }
+.scrollable-history::-webkit-scrollbar-thumb { background: #B5DFC5; border-radius: 3px; }
+
+.col-history .history-item {
+  padding: 12px 14px;
+  border-radius: 14px;
+  margin: 0;
+}
+
+.col-history .history-item .emoji { font-size: 1.4rem; }
+.col-history .history-item .reason { font-size: 0.88rem; }
+.col-history .history-item .date { font-size: 0.7rem; }
+.col-history .history-item .points {
+  font-size: 1rem;
+  padding: 4px 12px;
+}
+
+/* Hall of fame strip - horizontal */
+.dashboard + #hallOfFameSection { margin-top: 18px; }
+
+/* Responsive: stack columns on narrow screens */
+@media (max-width: 900px) {
+  .dashboard {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "character"
+      "praise"
+      "history";
+  }
+  .scrollable-history {
+    max-height: 280px;
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Character zone stacks vertically on narrow screens */
+@media (max-width: 600px) {
+  .col-character .character-zone {
+    flex-direction: column;
+  }
+  .char-stats-vertical {
+    width: 100%;
+    flex-direction: row;
+  }
+}
+
+/* Character Display */
+.character-zone {
+  background: white;
+  border-radius: 24px;
+  padding: 30px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.character-zone::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 120px;
+  background: linear-gradient(135deg, #E8F5EE, #E8F5E9);
+  z-index: 0;
+}
+
+.character-stage {
+  position: relative;
+  z-index: 1;
+  font-size: 0.85rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 8px;
+  display: inline-block;
+  background: white;
+  padding: 4px 16px;
+  border-radius: 20px;
+  box-shadow: 0 2px 8px rgba(111, 207, 161, 0.2);
+}
+
+.character-display {
+  position: relative;
+  z-index: 1;
+  width: 200px;
+  height: 200px;
+  margin: 10px auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.character-svg {
+  width: 100%;
+  height: 100%;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+.character-name {
+  position: relative;
+  z-index: 1;
+  font-family: 'Jua', sans-serif;
+  font-size: 1.6rem;
+  color: var(--text);
+  margin: 8px 0 4px;
+}
+
+.character-title {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+
+.collection-info {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #FFF9E6, #FFEDB3);
+  padding: 5px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #B8860B;
+  margin-bottom: 12px;
+}
+
+.level-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.level-badge {
+  background: linear-gradient(135deg, var(--accent), #F39C12);
+  color: white;
+  font-family: 'Jua', sans-serif;
+  font-size: 1.1rem;
+  padding: 6px 18px;
+  border-radius: 20px;
+  box-shadow: 0 3px 10px rgba(253, 203, 110, 0.4);
+}
+
+.total-points { font-size: 0.9rem; color: var(--text-light); }
+.total-points span { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+
+.exp-bar-container {
+  background: #D5E0DA;
+  border-radius: 12px;
+  height: 20px;
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 6px;
+  border: 1px solid #BDD0C5;
+}
+
+.exp-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 12px;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.exp-bar::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+  animation: shimmer 2s infinite;
+}
+
+.exp-text { font-size: 0.8rem; color: var(--text-light); text-align: right; }
+
+/* Stats */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: 16px;
+  padding: 16px 10px;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+
+.stat-card .icon { font-size: 1.5rem; margin-bottom: 6px; }
+.stat-card .value { font-family: 'Jua', sans-serif; font-size: 1.4rem; color: var(--primary); }
+.stat-card .label { font-size: 0.75rem; color: var(--text-light); margin-top: 2px; }
+
+/* Praise Form */
+.praise-form {
+  background: white;
+  border-radius: 20px;
+  padding: 24px;
+  box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.praise-form h3 {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.2rem;
+  margin-bottom: 6px;
+  color: var(--primary);
+}
+
+.praise-form .subtitle {
+  font-size: 0.82rem;
+  color: var(--text-light);
+  margin-bottom: 16px;
+}
+
+.form-group { margin-bottom: 14px; }
+
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 2px solid #E8E8E8;
+  border-radius: 12px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.9rem;
+  transition: border-color 0.3s;
+  background: white;
+}
+
+.form-group input:focus { outline: none; border-color: var(--primary-light); }
+
+.quick-praise {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.quick-btn {
+  padding: 8px 14px;
+  border: 2px solid #E8E8E8;
+  border-radius: 20px;
+  background: white;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.quick-btn:hover { border-color: var(--primary-light); background: #E8F5EE; }
+.quick-btn.selected { border-color: var(--primary); background: var(--primary); color: white; }
+
+.points-select { display: flex; gap: 8px; }
+
+.point-chip {
+  flex: 1;
+  padding: 10px;
+  border: 2px solid #E8E8E8;
+  border-radius: 12px;
+  background: white;
+  text-align: center;
+  cursor: pointer;
+  font-family: 'Jua', sans-serif;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.point-chip:hover { border-color: var(--accent); }
+.point-chip.selected {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, #FFF9E6, #FFF3CD);
+  color: #F39C12;
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-family: 'Jua', sans-serif;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 15px rgba(111, 207, 161, 0.3);
+}
+
+.submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(111, 207, 161, 0.35); }
+.submit-btn:active { transform: translateY(0); }
+
+/* Signature Pad */
+.signature-area {
+  border: 2px dashed #B8E0CA;
+  border-radius: 12px;
+  background: #F4FBF7;
+  padding: 8px;
+  position: relative;
+}
+
+.signature-canvas {
+  width: 100%;
+  height: 140px;
+  background: white;
+  border-radius: 8px;
+  cursor: crosshair;
+  touch-action: none;
+  display: block;
+}
+
+.signature-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 6px;
+  padding: 0 4px;
+}
+
+.signature-hint {
+  font-size: 0.72rem;
+  color: var(--text-light);
+}
+
+.clear-sig-btn {
+  background: #FFE8E8;
+  color: var(--accent2);
+  border: none;
+  padding: 5px 12px;
+  border-radius: 16px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.clear-sig-btn:hover { background: #FFD0D0; }
+
+/* History */
+.history-list { display: flex; flex-direction: column; gap: 10px; }
+
+.history-item {
+  background: white;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.history-item .emoji { font-size: 1.6rem; }
+.history-item .info { flex: 1; }
+.history-item .reason { font-weight: 700; font-size: 0.95rem; }
+.history-item .date { font-size: 0.72rem; color: #B2BEC3; margin-top: 4px; }
+
+.history-item .sig-img {
+  max-height: 60px;
+  max-width: 95px;
+  opacity: 0.8;
+  flex-shrink: 0;
+  background: #F4FBF7;
+  border-radius: 10px;
+  padding: 4px 8px;
+  border: 1px solid #E8F5EE;
+}
+
+.history-item .points {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.1rem;
+  color: var(--accent);
+  background: #FFF9E6;
+  padding: 4px 12px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+/* Category Stats */
+.category-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+.category-item {
+  background: white;
+  border-radius: 16px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.category-item .cat-emoji { font-size: 1.4rem; }
+.category-item .cat-info { flex: 1; }
+.category-item .cat-name { font-weight: 700; font-size: 0.9rem; }
+
+.cat-bar-bg {
+  height: 8px;
+  background: #EEE;
+  border-radius: 4px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+
+.cat-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--primary-light));
+  border-radius: 4px;
+  transition: width 0.5s;
+}
+
+.category-item .cat-count {
+  font-family: 'Jua', sans-serif;
+  font-size: 1rem;
+  color: var(--primary);
+}
+
+/* Hall of Fame */
+.hall-of-fame {
+  background: linear-gradient(135deg, #FFF9E6, #FFEDB3);
+  border-radius: 20px;
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 2px solid #FFD700;
+}
+
+.hall-of-fame h4 {
+  font-family: 'Jua', sans-serif;
+  color: #B8860B;
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.fame-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.fame-card {
+  background: white;
+  border-radius: 14px;
+  padding: 12px 8px;
+  text-align: center;
+  border: 2px solid #FFD700;
+  box-shadow: 0 2px 8px rgba(255, 215, 0, 0.2);
+}
+
+.fame-card .fame-svg-wrap {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 4px;
+}
+
+.fame-card .fame-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+  animation: none;
+}
+
+.fame-card .fame-name {
+  font-family: 'Jua', sans-serif;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+.fame-card .fame-date {
+  font-size: 0.68rem;
+  color: var(--text-light);
+  margin-top: 2px;
+}
+
+/* Settings */
+.settings-section {
+  background: #F4FBF7;
+  border-radius: 16px;
+  padding: 18px;
+  border: 1px solid #E8E8FF;
+  margin-bottom: 16px;
+}
+
+.settings-section h3 {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  color: var(--primary);
+}
+
+.char-name-input { display: flex; gap: 8px; margin-top: 8px; }
+
+.add-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  white-space: nowrap;
+}
+
+.name-input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 2px solid #E8E8E8;
+  border-radius: 12px;
+  font-family: 'Noto Sans KR', sans-serif;
+  font-size: 0.9rem;
+}
+
+.name-input:focus { outline: none; border-color: var(--primary-light); }
+
+/* Reward Settings */
+.reward-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.reward-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.reward-row .reward-num {
+  font-family: 'Jua', sans-serif;
+  background: var(--accent);
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.reward-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 2px solid #E8E8E8;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  font-family: 'Noto Sans KR', sans-serif;
+}
+
+.reward-row input:focus { outline: none; border-color: var(--primary-light); }
+
+.danger-zone {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 2px dashed #FFCCCC;
+}
+
+.danger-btn {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid var(--accent2);
+  border-radius: 12px;
+  background: white;
+  color: var(--accent2);
+  font-weight: 700;
+  cursor: pointer;
+  font-family: 'Noto Sans KR', sans-serif;
+  transition: all 0.2s;
+}
+
+.danger-btn:hover { background: #FFF0F0; }
+
+/* Stage Preview Button */
+.preview-btn {
+  position: relative;
+  z-index: 1;
+  margin-top: 4px;
+  padding: 8px 18px;
+  border: 2px solid var(--primary-light);
+  border-radius: 20px;
+  background: white;
+  color: var(--primary);
+  font-family: 'Noto Sans KR', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.preview-btn:hover { background: #E8F5EE; }
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.modal-overlay.show { display: flex; }
+
+.modal-box {
+  background: white;
+  border-radius: 24px;
+  padding: 28px 24px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes popIn {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.modal-box h2 {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.4rem;
+  color: var(--primary);
+  text-align: center;
+  margin-bottom: 6px;
+}
+
+.modal-box .subtitle {
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin-bottom: 18px;
+}
+
+/* Stage preview grid */
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.preview-card {
+  background: linear-gradient(135deg, #F4FBF7, #E8F5EE);
+  border: 2px solid #E8E8E8;
+  border-radius: 16px;
+  padding: 14px 8px;
+  text-align: center;
+  position: relative;
+}
+
+.preview-card.unlocked {
+  border-color: var(--primary-light);
+  background: linear-gradient(135deg, #E8F5EE, #E8F5E9);
+}
+
+.preview-card.current {
+  border-color: var(--accent);
+  background: linear-gradient(135deg, #FFF9E6, #FFF3CD);
+  box-shadow: 0 4px 15px rgba(253, 203, 110, 0.3);
+}
+
+.preview-card .lock-icon {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.9rem;
+  opacity: 0.5;
+}
+
+.preview-card .current-label {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent);
+  color: white;
+  font-size: 0.65rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.preview-card .preview-char-wrap {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 4px;
+}
+
+.preview-card .preview-char-wrap svg {
+  width: 100%;
+  height: 100%;
+  animation: none;
+}
+
+.preview-card.locked .preview-char-wrap {
+  filter: none;
+  opacity: 1;
+}
+
+.preview-card .preview-char-wrap.question-mark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Jua', sans-serif;
+  font-size: 4rem;
+  color: #B2BEC3;
+  background: linear-gradient(135deg, #E8F5EE, #D9F0E1);
+  border-radius: 16px;
+  border: 3px dashed #A8D5BC;
+}
+
+.preview-card .stage-level {
+  font-family: 'Jua', sans-serif;
+  font-size: 0.85rem;
+  color: var(--primary);
+}
+
+.preview-card .stage-name-text {
+  font-weight: 700;
+  font-size: 0.85rem;
+  margin: 2px 0;
+}
+
+.preview-card .stage-pts {
+  font-size: 0.7rem;
+  color: var(--text-light);
+}
+
+/* Character Selection */
+.char-select-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.char-select-card {
+  background: linear-gradient(135deg, #F4FBF7, #E8F5EE);
+  border: 3px solid #E8E8E8;
+  border-radius: 18px;
+  padding: 16px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.char-select-card:hover {
+  transform: translateY(-3px);
+  border-color: var(--primary-light);
+  box-shadow: 0 6px 20px rgba(111, 207, 161, 0.25);
+}
+
+.char-select-card .select-svg-wrap {
+  width: 110px;
+  height: 110px;
+  margin: 0 auto 6px;
+}
+
+.char-select-card .select-svg-wrap svg {
+  width: 100%;
+  height: 100%;
+  animation: float 3s ease-in-out infinite;
+}
+
+.char-select-card .select-name {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.1rem;
+  color: var(--text);
+  margin-bottom: 2px;
+}
+
+.char-select-card .select-desc {
+  font-size: 0.72rem;
+  color: var(--text-light);
+}
+
+/* Modal close button */
+.modal-close-btn {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-light));
+  color: white;
+  font-family: 'Jua', sans-serif;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Completion celebration */
+.celebration-modal {
+  text-align: center;
+}
+
+.celebration-modal .crown-icon {
+  font-size: 2.5rem;
+  margin-bottom: 6px;
+  animation: pulse 1.5s infinite;
+}
+
+.celebration-modal h2 {
+  background: linear-gradient(135deg, #F39C12, #FDCB6E);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-size: 1.6rem;
+  margin-bottom: 4px;
+}
+
+.celebration-modal .completed-char {
+  width: 180px;
+  height: 180px;
+  margin: 8px auto;
+  position: relative;
+}
+
+.celebration-modal .completed-char svg {
+  width: 100%;
+  height: 100%;
+}
+
+.celebration-modal .completed-char::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  background: radial-gradient(circle, rgba(253,203,110,0.4) 0%, transparent 70%);
+  z-index: -1;
+  animation: pulse 2s infinite;
+}
+
+.reward-box {
+  background: linear-gradient(135deg, #FFF9E6, #FFEDB3);
+  border: 2px dashed #FDCB6E;
+  border-radius: 16px;
+  padding: 16px;
+  margin: 14px 0;
+}
+
+.reward-box .reward-label {
+  font-size: 0.8rem;
+  color: #B8860B;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.reward-box .reward-text {
+  font-family: 'Jua', sans-serif;
+  font-size: 1.2rem;
+  color: var(--text);
+}
+
+.reward-box .reward-empty {
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+/* Particles */
+.particle {
+  position: fixed;
+  pointer-events: none;
+  z-index: 999;
+  font-size: 1.5rem;
+  animation: particleUp 1.5s ease-out forwards;
+}
+
+@keyframes particleUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-120px) scale(0.5); }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-light);
+}
+
+.empty-state .icon { font-size: 3rem; margin-bottom: 12px; }
+.empty-state p { font-size: 0.9rem; }
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: linear-gradient(135deg, #FF6B6B, #EE5A24);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+@media (max-width: 400px) {
+  .header h1 { font-size: 1.4rem; }
+  .character-display { width: 170px; height: 170px; }
+  .stats-row { gap: 8px; }
+  .stat-card { padding: 12px 6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1 id="headerTitle">🌟 캐릭터 키우기</h1>
+  <p id="headerDesc">알을 깨우고 캐릭터를 성장시켜보세요!</p>
+  <div class="header-buttons">
+    <button class="header-btn" onclick="openHallOfFame()" title="명예의 전당">🏆</button>
+    <button class="header-btn" onclick="openSettings()" title="설정">⚙️</button>
+  </div>
+</div>
+
+<!-- MAIN TAB - 3 COLUMN DASHBOARD -->
+<div id="tab-home" class="tab-content active">
+  <div class="dashboard">
+
+    <!-- LEFT COLUMN: STATS (left) + CHARACTER (right) -->
+    <div class="dash-col col-character">
+      <div class="character-zone">
+        <div class="char-stats-vertical">
+          <div class="stat-card">
+            <div class="icon">⭐</div>
+            <div class="value" id="statTotal">0</div>
+            <div class="label">총 칭찬</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon">📅</div>
+            <div class="value" id="statToday">0</div>
+            <div class="label">오늘</div>
+          </div>
+          <div class="stat-card">
+            <div class="icon">🔥</div>
+            <div class="value" id="statStreak">0</div>
+            <div class="label">연속</div>
+          </div>
+          <div class="collection-info" id="collectionInfo">🏆 0 / 4</div>
+        </div>
+
+        <div class="char-main">
+          <div class="character-stage" id="stageName">알</div>
+          <div class="character-display" id="characterDisplay"></div>
+          <div class="character-name" id="charName">무럭이</div>
+          <div class="character-title" id="charTitle">아직 알 속에서 자고 있어요</div>
+          <div id="streakArea"></div>
+          <div class="level-info">
+            <div class="level-badge" id="levelBadge">Lv.1</div>
+            <div class="total-points">현재: <span id="totalPoints">0</span>P</div>
+          </div>
+          <div class="exp-bar-container">
+            <div class="exp-bar" id="expBar" style="width: 0%"></div>
+          </div>
+          <div class="exp-text" id="expText">다음 레벨까지 8 포인트</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MIDDLE COLUMN: PRAISE FORM -->
+    <div class="dash-col col-praise">
+      <div class="praise-form">
+        <div class="praise-header">
+          <h3>⭐ 칭찬하기</h3>
+          <p class="subtitle">열심히 노력하는 우리 반을 칭찬해주세요 💖</p>
+        </div>
+
+        <div class="form-group">
+          <label>무엇을 잘 했나요?</label>
+          <div class="quick-praise">
+            <button class="quick-btn" data-reason="수업을 열심히 들었어요">
+              <span class="qb-emoji">👏</span>
+              <span class="qb-text">수업을 열심히<br>들었어요</span>
+            </button>
+            <button class="quick-btn" data-reason="적극적으로 참여했어요">
+              <span class="qb-emoji">🎤</span>
+              <span class="qb-text">적극적으로<br>참여했어요</span>
+            </button>
+            <button class="quick-btn" data-reason="과제를 모두 제출했어요">
+              <span class="qb-emoji">📝</span>
+              <span class="qb-text">과제를 모두<br>제출했어요</span>
+            </button>
+            <button class="quick-btn" data-reason="인사를 잘했어요">
+              <span class="qb-emoji">💖</span>
+              <span class="qb-text">인사를<br>잘했어요</span>
+            </button>
+            <button class="quick-btn" data-reason="함께 협력했어요">
+              <span class="qb-emoji">🏆</span>
+              <span class="qb-text">함께<br>협력했어요</span>
+            </button>
+            <button class="quick-btn" data-reason="조용히 자습했어요">
+              <span class="qb-emoji">📚</span>
+              <span class="qb-text">조용히<br>자습했어요</span>
+            </button>
+          </div>
+          <input type="text" id="praiseReason" placeholder="직접 입력하기">
+        </div>
+
+        <div class="form-row">
+          <div class="form-group points-group">
+            <label>포인트</label>
+            <div class="points-select">
+              <div class="point-chip" data-points="1" onclick="selectPoints(this)">+1</div>
+              <div class="point-chip selected" data-points="2" onclick="selectPoints(this)">+2</div>
+              <div class="point-chip" data-points="3" onclick="selectPoints(this)">+3</div>
+              <div class="point-chip" data-points="5" onclick="selectPoints(this)">+5</div>
+            </div>
+          </div>
+          <div class="form-group signature-group">
+            <label>선생님 서명 ✍️</label>
+            <div class="signature-area">
+              <canvas class="signature-canvas" id="signatureCanvas"></canvas>
+              <div class="signature-controls">
+                <button class="clear-sig-btn" onclick="clearSignature()">지우기</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <button class="submit-btn" onclick="givePraise()">🌟 칭찬하기</button>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN: HISTORY -->
+    <div class="dash-col col-history">
+      <div class="history-panel">
+        <div class="history-header">
+          <h3>📋 칭찬 기록</h3>
+          <button class="stat-btn" onclick="openStatsModal()">📊 통계</button>
+        </div>
+        <div id="recentHistory" class="history-list scrollable-history"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- HALL OF FAME MODAL -->
+<div class="modal-overlay" id="hallOfFameModal">
+  <div class="modal-box">
+    <h2>🏆 명예의 전당</h2>
+    <p class="subtitle">우리 반이 키워낸 캐릭터들이에요!</p>
+    <div id="hallOfFameSection"></div>
+    <button class="modal-close-btn" style="margin-top: 16px;" onclick="closeModal('hallOfFameModal')">닫기</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-box">
+    <h2>⚙️ 설정</h2>
+    <p class="subtitle">캐릭터와 데이터를 관리해요</p>
+
+    <div class="settings-section">
+      <h3>🐣 캐릭터 이름</h3>
+      <div class="char-name-input">
+        <input type="text" class="name-input" id="charNameInput" placeholder="현재 캐릭터 이름" maxlength="10">
+        <button class="add-btn" onclick="saveCharName()">저장</button>
+      </div>
+      <button class="add-btn" style="margin-top: 12px; width:100%; background: #00B894;" onclick="openCharSelect(true)">🔄 다른 캐릭터로 바꾸기</button>
+      <p style="font-size: 0.72rem; color: var(--text-light); margin-top: 6px;">⚠️ 현재 캐릭터 진행도가 사라져요!</p>
+    </div>
+
+    <div class="settings-section">
+      <h3>📖 성장 도감</h3>
+      <p style="font-size: 0.78rem; color: var(--text-light); margin-bottom: 10px;">현재 키우는 캐릭터의 5단계 성장 과정을 볼 수 있어요</p>
+      <button class="add-btn" style="width:100%; background: var(--primary-light); color: var(--primary-dark);" onclick="openPreview()">📖 성장 도감 보기</button>
+    </div>
+
+    <div class="settings-section">
+      <h3>📊 데이터</h3>
+      <button class="add-btn" style="width:100%; margin-bottom: 10px; padding: 12px; background: var(--success);" onclick="exportData()">📥 데이터 내보내기 (백업)</button>
+      <label class="add-btn" style="width:100%; display:block; text-align:center; padding: 12px; background: #7DCEA0; cursor:pointer;">
+        📤 데이터 불러오기
+        <input type="file" accept=".json" onchange="importData(event)" style="display:none">
+      </label>
+      <div class="danger-zone">
+        <button class="danger-btn" onclick="resetAll()">🗑️ 전체 초기화</button>
+      </div>
+    </div>
+
+    <button class="modal-close-btn" style="margin-top: 16px;" onclick="closeModal('settingsModal')">닫기</button>
+  </div>
+</div>
+
+<!-- Stage Preview Modal -->
+<div class="modal-overlay" id="previewModal">
+  <div class="modal-box">
+    <h2>📖 성장 도감</h2>
+    <p class="subtitle" id="previewSubtitle">우리 캐릭터의 성장 단계를 확인해보세요!</p>
+    <div class="preview-grid" id="previewGrid"></div>
+    <button class="modal-close-btn" onclick="closeModal('previewModal')">닫기</button>
+  </div>
+</div>
+
+<!-- Character Selection Modal -->
+<div class="modal-overlay" id="charSelectModal">
+  <div class="modal-box">
+    <h2 id="selectTitle">🐣 어떤 알을 키울까요?</h2>
+    <p class="subtitle" id="selectSubtitle">키우고 싶은 캐릭터를 골라보세요!</p>
+    <div class="char-select-grid" id="charSelectGrid"></div>
+    <button class="modal-close-btn" id="selectCloseBtn" onclick="closeModal('charSelectModal')" style="display:none;">닫기</button>
+  </div>
+</div>
+
+<!-- Level Up Modal -->
+<div class="modal-overlay" id="levelUpModal">
+  <div class="modal-box" style="text-align:center; max-width: 360px;">
+    <div style="font-size:2rem; margin-bottom:10px;">🎉✨🌟✨🎉</div>
+    <h2 id="modalTitle">레벨 업!</h2>
+    <p id="modalDesc" style="color: var(--text-light); margin-bottom: 16px;">캐릭터가 성장했어요!</p>
+    <div id="modalChar" style="width: 160px; height: 160px; margin: 10px auto;"></div>
+    <button class="modal-close-btn" onclick="closeModal('levelUpModal')">확인!</button>
+  </div>
+</div>
+
+<!-- Completion Celebration Modal -->
+<div class="modal-overlay" id="completionModal">
+  <div class="modal-box celebration-modal">
+    <div class="crown-icon">👑</div>
+    <h2>완전체 달성!</h2>
+    <p class="subtitle" id="completionDesc">캐릭터를 완전히 키워냈어요!</p>
+    <div class="completed-char" id="completedCharSvg"></div>
+    <p style="font-size: 0.95rem; color: var(--text-light); margin: 14px 0; line-height: 1.6;">
+      🎉 우리 반 모두 정말 대단해요!<br>
+      함께 모은 칭찬으로 멋지게 키워냈어요 ✨
+    </p>
+    <button class="modal-close-btn" onclick="afterCompletion()">새 캐릭터 키우기 →</button>
+  </div>
+</div>
+
+<!-- Stats Modal -->
+<div class="modal-overlay" id="statsModal">
+  <div class="modal-box">
+    <h2>📊 칭찬 통계</h2>
+    <p class="subtitle">우리 반은 어떤 칭찬을 많이 받았을까?</p>
+    <div id="categoryList" class="category-list"></div>
+    <h3 style="font-family: Jua; color: var(--primary); margin: 20px 0 10px; font-size: 1.1rem;">📜 전체 기록</h3>
+    <div id="fullHistory" class="history-list" style="max-height: 300px; overflow-y: auto;"></div>
+    <button class="modal-close-btn" style="margin-top: 16px;" onclick="closeModal('statsModal')">닫기</button>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'class_character_share_v1';
+
+// ===== STAGES (5단계) =====
+const STAGES = [
+  { level: 1, name: '알', minPts: 0, maxPts: 8 },
+  { level: 2, name: '깨어남', minPts: 8, maxPts: 20 },
+  { level: 3, name: '아기', minPts: 20, maxPts: 40 },
+  { level: 4, name: '청년', minPts: 40, maxPts: 65 },
+  { level: 5, name: '전설', minPts: 65, maxPts: 100 },
+];
+const MAX_POINTS = 100;
+
+const PRAISE_EMOJIS = {
+  '수업을 열심히 들었어요': '👏', '적극적으로 참여했어요': '🎤',
+  '과제를 모두 제출했어요': '📝', '인사를 잘했어요': '💖',
+  '함께 협력했어요': '🏆', '조용히 자습했어요': '📚',
+  // 옛 데이터 호환
+  '집중해서 수업했어요': '👏', '손들고 발표했어요': '🎤',
+  '과제를 끝까지 했어요': '📝',
+  // 옛 데이터 호환
+  '집중해서 수업': '👏', '친구 도와주기': '🤝', '손들고 발표': '🎤',
+  '과제 끝까지 완료': '📝', '인사 잘하기': '💖', '함께 협력하기': '🏆',
+  '조용히 자습': '📚',
+  '수업 태도 굿': '👏', '서로 도움': '🤝', '발표 활발': '🎤',
+  '과제 완료': '📝', '청소 깔끔': '🧹', '예의 바른 하루': '💖',
+  '창의적 수업 참여': '💡', '단합력 최고': '🏆', '조용한 자습': '📚',
+  '다른 반 도움': '🌈'
+};
+
+// ===== CHARACTERS =====
+// Helper for eyes
+const eyes = (cx1, cy1, cx2, cy2, r) => `
+  <circle cx="${cx1}" cy="${cy1}" r="${r}" fill="white"/>
+  <circle cx="${cx2}" cy="${cy2}" r="${r}" fill="white"/>
+  <circle cx="${cx1+1}" cy="${cy1+1}" r="${r*0.55}" fill="#2D3436"/>
+  <circle cx="${cx2+1}" cy="${cy2+1}" r="${r*0.55}" fill="#2D3436"/>
+  <circle cx="${cx1+1.5}" cy="${cy1-0.8}" r="${r*0.22}" fill="white"/>
+  <circle cx="${cx2+1.5}" cy="${cy2-0.8}" r="${r*0.22}" fill="white"/>
+`;
+
+const commonDefs = (p, c1, c2, c3) => `
+  <defs>
+    <linearGradient id="${p}-body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="${c1}"/>
+      <stop offset="100%" stop-color="${c2}"/>
+    </linearGradient>
+    <linearGradient id="${p}-belly" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="${c3}"/>
+      <stop offset="100%" stop-color="${c3}cc"/>
+    </linearGradient>
+    <radialGradient id="${p}-glow">
+      <stop offset="0%" stop-color="#FDCB6E" stop-opacity="0.5"/>
+      <stop offset="100%" stop-color="#FDCB6E" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="${p}-shadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-opacity="0.25"/>
+    </filter>
+  </defs>
+`;
+
+// === DRAGON ===
+function drawDragon(level, p) {
+  const defs = commonDefs(p, '#B19CFF', '#5B3FCC', '#F2EBFF');
+
+  if (level === 1) {
+    return defs + `
+      <ellipse cx="100" cy="120" rx="44" ry="52" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <g opacity="0.3" fill="#FFFFFF">
+        <path d="M85,90 L92,85 L99,90 L92,95 Z"/>
+        <path d="M100,82 L107,77 L114,82 L107,87 Z"/>
+        <path d="M115,90 L122,85 L129,90 L122,95 Z"/>
+        <path d="M90,108 L97,103 L104,108 L97,113 Z"/>
+        <path d="M105,108 L112,103 L119,108 L112,113 Z"/>
+        <path d="M85,128 L92,123 L99,128 L92,133 Z"/>
+        <path d="M100,123 L107,118 L114,123 L107,128 Z"/>
+        <path d="M115,130 L122,125 L129,130 L122,135 Z"/>
+        <path d="M92,148 L99,143 L106,148 L99,153 Z"/>
+        <path d="M108,148 L115,143 L122,148 L115,153 Z"/>
+      </g>
+      <ellipse cx="84" cy="100" rx="6" ry="14" fill="white" opacity="0.4"/>
+      <text x="100" y="128" text-anchor="middle" font-size="16" fill="#FFFFFF" opacity="0.7" font-family="Jua">zZz</text>
+    `;
+  }
+
+  if (level === 2) {
+    return defs + `
+      <ellipse cx="100" cy="125" rx="44" ry="50" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <path d="M65,100 L80,108 L72,118 L88,128 L80,140" stroke="#3D2980" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M130,95 L120,105 L128,115 L118,125 L126,135" stroke="#3D2980" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Cute curved baby horns peeking -->
+      <path d="M 84 72 C 80 55, 90 50, 92 70 Z" fill="#5B3FCC"/>
+      <path d="M 116 72 C 120 55, 110 50, 108 70 Z" fill="#5B3FCC"/>
+      <!-- Yellow dragon eyes peeking -->
+      <ellipse cx="92" cy="105" rx="5" ry="5.5" fill="#FDCB6E"/>
+      <ellipse cx="108" cy="105" rx="5" ry="5.5" fill="#FDCB6E"/>
+      <ellipse cx="92" cy="106" rx="2.5" ry="3.5" fill="#2D3436"/>
+      <ellipse cx="108" cy="106" rx="2.5" ry="3.5" fill="#2D3436"/>
+      <circle cx="93" cy="104" r="0.9" fill="white"/>
+      <circle cx="109" cy="104" r="0.9" fill="white"/>
+      <!-- Tiny smoke puffs -->
+      <circle cx="100" cy="118" r="2" fill="white" opacity="0.6"/>
+      <circle cx="103" cy="115" r="1.5" fill="white" opacity="0.5"/>
+    `;
+  }
+
+  if (level === 3) {
+    return defs + `
+      <!-- Eggshell remnants -->
+      <path d="M 60 145 Q 60 170 100 170 Q 140 170 140 145 L 134 132 L 124 142 L 114 132 L 104 142 L 94 132 L 84 142 L 74 132 L 66 142 Z" fill="#A88FFF" opacity="0.7"/>
+      <!-- Cute round wing buds -->
+      <ellipse cx="62" cy="100" rx="13" ry="16" fill="url(#${p}-body)" opacity="0.85"/>
+      <ellipse cx="138" cy="100" rx="13" ry="16" fill="url(#${p}-body)" opacity="0.85"/>
+      <ellipse cx="62" cy="100" rx="6" ry="9" fill="url(#${p}-belly)" opacity="0.6"/>
+      <ellipse cx="138" cy="100" rx="6" ry="9" fill="url(#${p}-belly)" opacity="0.6"/>
+      <!-- Round chubby body -->
+      <ellipse cx="100" cy="108" rx="38" ry="36" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <ellipse cx="100" cy="118" rx="23" ry="17" fill="url(#${p}-belly)"/>
+      <!-- Cute curved horns -->
+      <path d="M 82 65 C 76 38, 90 35, 92 65 Z" fill="#5B3FCC"/>
+      <path d="M 118 65 C 124 38, 110 35, 108 65 Z" fill="#5B3FCC"/>
+      <ellipse cx="84" cy="50" rx="1.5" ry="3" fill="#3D2980"/>
+      <ellipse cx="116" cy="50" rx="1.5" ry="3" fill="#3D2980"/>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="86" cy="95" rx="9" ry="10" fill="white"/>
+      <ellipse cx="114" cy="95" rx="9" ry="10" fill="white"/>
+      <ellipse cx="87" cy="97" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <ellipse cx="115" cy="97" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <circle cx="89" cy="94" r="2.2" fill="white"/>
+      <circle cx="117" cy="94" r="2.2" fill="white"/>
+      <circle cx="84" cy="99" r="0.9" fill="white"/>
+      <circle cx="112" cy="99" r="0.9" fill="white"/>
+      <!-- Sweet smile -->
+      <path d="M 92 113 Q 100 119 108 113" stroke="#2D3436" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Cheek blush -->
+      <circle cx="73" cy="108" r="4.5" fill="#FF9999" opacity="0.65"/>
+      <circle cx="127" cy="108" r="4.5" fill="#FF9999" opacity="0.65"/>
+      <!-- Tiny round tail -->
+      <ellipse cx="142" cy="155" rx="10" ry="6" fill="url(#${p}-body)" transform="rotate(-20 142 155)"/>
+    `;
+  }
+
+  if (level === 4) {
+    return defs + `
+      <!-- Spread bat-like wings -->
+      <path d="M 60 88 C 28 65, 8 95, 10 130 C 25 148, 50 138, 65 118 C 60 105, 60 95, 60 88 Z" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <path d="M 140 88 C 172 65, 192 95, 190 130 C 175 148, 150 138, 135 118 C 140 105, 140 95, 140 88 Z" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <!-- Wing membrane curves -->
+      <path d="M 22 95 C 16 115, 25 135, 38 138" stroke="#A38FE8" stroke-width="1.2" fill="none" opacity="0.6"/>
+      <path d="M 178 95 C 184 115, 175 135, 162 138" stroke="#A38FE8" stroke-width="1.2" fill="none" opacity="0.6"/>
+      <!-- Cute spike tail -->
+      <path d="M 100 158 C 120 168, 138 165, 145 175 L 152 168 L 145 158 Z" fill="url(#${p}-body)"/>
+      <!-- Body -->
+      <ellipse cx="100" cy="105" rx="44" ry="46" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <ellipse cx="100" cy="118" rx="27" ry="22" fill="url(#${p}-belly)"/>
+      <!-- Tummy stripes -->
+      <path d="M 90 110 Q 100 113 110 110" stroke="#DDD0FF" stroke-width="1" fill="none" opacity="0.7"/>
+      <path d="M 88 120 Q 100 124 112 120" stroke="#DDD0FF" stroke-width="1" fill="none" opacity="0.7"/>
+      <!-- Bigger curved horns -->
+      <path d="M 76 60 C 68 28, 88 22, 92 60 Z" fill="#5B3FCC"/>
+      <path d="M 124 60 C 132 28, 112 22, 108 60 Z" fill="#5B3FCC"/>
+      <ellipse cx="80" cy="40" rx="2" ry="3" fill="#3D2980"/>
+      <ellipse cx="120" cy="40" rx="2" ry="3" fill="#3D2980"/>
+      <!-- Big sparkly eyes (yellow dragon eyes) -->
+      <ellipse cx="84" cy="92" rx="10" ry="11" fill="white"/>
+      <ellipse cx="116" cy="92" rx="10" ry="11" fill="white"/>
+      <ellipse cx="85" cy="94" rx="6" ry="7" fill="#FDCB6E"/>
+      <ellipse cx="117" cy="94" rx="6" ry="7" fill="#FDCB6E"/>
+      <ellipse cx="85" cy="95" rx="3" ry="4.5" fill="#2D3436"/>
+      <ellipse cx="117" cy="95" rx="3" ry="4.5" fill="#2D3436"/>
+      <circle cx="87" cy="92" r="2.2" fill="white"/>
+      <circle cx="119" cy="92" r="2.2" fill="white"/>
+      <circle cx="83" cy="97" r="0.9" fill="white"/>
+      <circle cx="115" cy="97" r="0.9" fill="white"/>
+      <!-- Sweet smile -->
+      <path d="M 90 110 Q 100 118 110 110" stroke="#2D3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Cute tiny fire breath -->
+      <path d="M 100 116 Q 96 124 100 132 Q 104 124 100 116 Z" fill="#FF6B6B"/>
+      <path d="M 100 118 Q 98 124 100 130 Q 102 124 100 118 Z" fill="#FDCB6E"/>
+      <!-- Cheek blush -->
+      <circle cx="72" cy="105" r="5" fill="#FF9999" opacity="0.7"/>
+      <circle cx="128" cy="105" r="5" fill="#FF9999" opacity="0.7"/>
+    `;
+  }
+
+  // === LEVEL 5: Legendary Dragon ===
+  return defs + `
+    <circle cx="100" cy="100" r="95" fill="url(#${p}-glow)"/>
+    <!-- Massive elegant wings -->
+    <path d="M 55 80 C 0 35, -5 145, 8 162 C 28 168, 60 130, 65 112 C 60 95, 58 85, 55 80 Z" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+    <path d="M 145 80 C 200 35, 205 145, 192 162 C 172 168, 140 130, 135 112 C 140 95, 142 85, 145 80 Z" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+    <!-- Wing membrane curves -->
+    <path d="M 18 70 C 8 100, 18 140, 30 158" stroke="#A38FE8" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M 35 85 C 25 115, 32 145, 45 158" stroke="#A38FE8" stroke-width="1" fill="none" opacity="0.5"/>
+    <path d="M 182 70 C 192 100, 182 140, 170 158" stroke="#A38FE8" stroke-width="1.5" fill="none" opacity="0.6"/>
+    <path d="M 165 85 C 175 115, 168 145, 155 158" stroke="#A38FE8" stroke-width="1" fill="none" opacity="0.5"/>
+    <!-- Long elegant tail -->
+    <path d="M 100 162 C 130 175, 150 165, 165 175 L 175 165 L 165 155 L 150 162 Z" fill="url(#${p}-body)"/>
+    <!-- Body -->
+    <ellipse cx="100" cy="105" rx="48" ry="50" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+    <ellipse cx="100" cy="118" rx="30" ry="24" fill="url(#${p}-belly)"/>
+    <text x="100" y="128" text-anchor="middle" font-size="22" fill="#FDCB6E">★</text>
+    <path d="M 88 108 Q 100 112 112 108" stroke="#DDD0FF" stroke-width="1" fill="none" opacity="0.7"/>
+    <!-- Crown of horns -->
+    <path d="M 68 55 C 58 22, 78 16, 80 50 Z" fill="#5B3FCC"/>
+    <path d="M 86 42 C 80 8, 96 6, 96 38 Z" fill="#3D2980"/>
+    <path d="M 104 38 C 104 6, 120 8, 114 42 Z" fill="#3D2980"/>
+    <path d="M 120 50 C 122 16, 142 22, 132 55 Z" fill="#5B3FCC"/>
+    <!-- Crown jewels -->
+    <circle cx="72" cy="32" r="2" fill="#FDCB6E"/>
+    <circle cx="92" cy="20" r="2.5" fill="#FF6B6B"/>
+    <circle cx="100" cy="14" r="3" fill="#FFD93D"/>
+    <circle cx="108" cy="20" r="2.5" fill="#FF6B6B"/>
+    <circle cx="128" cy="32" r="2" fill="#FDCB6E"/>
+    <!-- Glowing dragon eyes (still cute) -->
+    <ellipse cx="83" cy="92" rx="11" ry="12" fill="white"/>
+    <ellipse cx="117" cy="92" rx="11" ry="12" fill="white"/>
+    <ellipse cx="84" cy="94" rx="7" ry="8" fill="#FDCB6E"/>
+    <ellipse cx="118" cy="94" rx="7" ry="8" fill="#FDCB6E"/>
+    <ellipse cx="84" cy="95" rx="3.5" ry="5" fill="#2D3436"/>
+    <ellipse cx="118" cy="95" rx="3.5" ry="5" fill="#2D3436"/>
+    <circle cx="86" cy="92" r="2.5" fill="white"/>
+    <circle cx="120" cy="92" r="2.5" fill="white"/>
+    <circle cx="82" cy="97" r="1.1" fill="white"/>
+    <circle cx="116" cy="97" r="1.1" fill="white"/>
+    <!-- Cute smile -->
+    <path d="M 88 110 Q 100 120 112 110" stroke="#2D3436" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <!-- Magnificent multi-layered fire breath -->
+    <path d="M 100 118 C 92 128, 95 145, 98 138 C 100 152, 100 162, 102 152 C 105 138, 108 145, 110 128 C 108 122, 100 118, 100 118 Z" fill="#FF6B6B" opacity="0.85"/>
+    <path d="M 100 122 C 95 130, 98 142, 100 138 C 102 148, 102 156, 104 148 C 106 138, 105 130, 100 122 Z" fill="#FDCB6E"/>
+    <path d="M 100 126 C 98 132, 100 140, 102 138 C 102 144, 100 150, 100 144 Z" fill="#FFE17A"/>
+    <!-- Cheek blush -->
+    <circle cx="69" cy="105" r="6" fill="#FF9999" opacity="0.75"/>
+    <circle cx="131" cy="105" r="6" fill="#FF9999" opacity="0.75"/>
+    <!-- Magical sparkles -->
+    <text x="20" y="55" font-size="16" fill="#FDCB6E">✦</text>
+    <text x="170" y="50" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="15" y="125" font-size="12" fill="#FDCB6E">✧</text>
+    <text x="180" y="130" font-size="12" fill="#FDCB6E">✧</text>
+    <text x="40" y="170" font-size="13" fill="#FFD93D">★</text>
+    <text x="155" y="170" font-size="13" fill="#FFD93D">★</text>
+  `;
+}
+
+// === FOX ===
+function drawFox(level, p) {
+  const defs = commonDefs(p, '#FFB570', '#E67E22', '#FFF4E6');
+
+  if (level === 1) {
+    // Egg with paw print pattern
+    return defs + `
+      <ellipse cx="100" cy="120" rx="44" ry="52" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <g opacity="0.4" fill="white">
+        <circle cx="80" cy="98" r="3"/>
+        <circle cx="78" cy="92" r="1.5"/><circle cx="82" cy="92" r="1.5"/>
+        <circle cx="76" cy="95" r="1.5"/><circle cx="84" cy="95" r="1.5"/>
+        <circle cx="120" cy="120" r="3"/>
+        <circle cx="118" cy="114" r="1.5"/><circle cx="122" cy="114" r="1.5"/>
+        <circle cx="116" cy="117" r="1.5"/><circle cx="124" cy="117" r="1.5"/>
+        <circle cx="95" cy="138" r="3"/>
+        <circle cx="93" cy="132" r="1.5"/><circle cx="97" cy="132" r="1.5"/>
+        <circle cx="91" cy="135" r="1.5"/><circle cx="99" cy="135" r="1.5"/>
+      </g>
+      <ellipse cx="84" cy="100" rx="6" ry="14" fill="white" opacity="0.4"/>
+      <text x="100" y="128" text-anchor="middle" font-size="16" fill="#FFFFFF" opacity="0.7" font-family="Jua">zZz</text>
+    `;
+  }
+
+  if (level === 2) {
+    // Cracked egg with cute peeking fox features
+    return defs + `
+      <ellipse cx="100" cy="125" rx="44" ry="50" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <path d="M65,100 L80,108 L72,118 L88,128 L80,140" stroke="#A0522D" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M130,95 L120,105 L128,115 L118,125 L126,135" stroke="#A0522D" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Pointy fox ears peeking out top -->
+      <path d="M 78 72 Q 73 50 92 70 Z" fill="#E67E22"/>
+      <path d="M 122 72 Q 127 50 108 70 Z" fill="#E67E22"/>
+      <path d="M 81 68 Q 78 55 88 67 Z" fill="#FFD8B0"/>
+      <path d="M 119 68 Q 122 55 112 67 Z" fill="#FFD8B0"/>
+      <!-- Curious peeking eyes -->
+      <ellipse cx="92" cy="105" rx="4" ry="4.5" fill="white"/>
+      <ellipse cx="108" cy="105" rx="4" ry="4.5" fill="white"/>
+      <ellipse cx="93" cy="106" rx="2.5" ry="3" fill="#2D3436"/>
+      <ellipse cx="109" cy="106" rx="2.5" ry="3" fill="#2D3436"/>
+      <circle cx="94" cy="104" r="0.9" fill="white"/>
+      <circle cx="110" cy="104" r="0.9" fill="white"/>
+      <!-- Tiny snout peeking -->
+      <ellipse cx="100" cy="118" rx="4" ry="2.5" fill="white"/>
+      <ellipse cx="100" cy="116" rx="1.5" ry="1.2" fill="#2D3436"/>
+    `;
+  }
+
+  if (level === 3) {
+    // Adorable baby fox in eggshell
+    return defs + `
+      <!-- Eggshell remnants at bottom -->
+      <path d="M 60 145 Q 60 170 100 170 Q 140 170 140 145 L 134 132 L 124 142 L 114 132 L 104 142 L 94 132 L 84 142 L 74 132 L 66 142 Z" fill="#FFB570" opacity="0.7"/>
+      <!-- One fluffy curved tail -->
+      <g transform="rotate(20 138 118)">
+        <path d="M 138 118 C 158 100, 180 105, 178 130 C 175 145, 155 142, 138 130 Z" fill="url(#${p}-body)"/>
+        <ellipse cx="172" cy="118" rx="7" ry="8" fill="white" opacity="0.95"/>
+      </g>
+      <!-- Round baby body -->
+      <ellipse cx="100" cy="108" rx="38" ry="36" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <!-- White chest -->
+      <ellipse cx="100" cy="118" rx="23" ry="17" fill="url(#${p}-belly)"/>
+      <!-- Big floppy fox ears -->
+      <path d="M 73 78 Q 62 40 92 70 Z" fill="#E67E22"/>
+      <path d="M 127 78 Q 138 40 108 70 Z" fill="#E67E22"/>
+      <path d="M 76 72 Q 70 50 86 68 Z" fill="#FFD8B0"/>
+      <path d="M 124 72 Q 130 50 114 68 Z" fill="#FFD8B0"/>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="86" cy="97" rx="9" ry="10" fill="white"/>
+      <ellipse cx="114" cy="97" rx="9" ry="10" fill="white"/>
+      <ellipse cx="87" cy="99" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <ellipse cx="115" cy="99" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <circle cx="89" cy="96" r="2.2" fill="white"/>
+      <circle cx="117" cy="96" r="2.2" fill="white"/>
+      <circle cx="84" cy="101" r="0.9" fill="white"/>
+      <circle cx="112" cy="101" r="0.9" fill="white"/>
+      <!-- Tiny cute snout -->
+      <ellipse cx="100" cy="113" rx="7" ry="5" fill="white"/>
+      <ellipse cx="100" cy="111" rx="2.2" ry="1.8" fill="#2D3436"/>
+      <!-- Sweet smile -->
+      <path d="M 93 117 Q 100 122 107 117" stroke="#2D3436" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Cheek blush -->
+      <circle cx="74" cy="110" r="4.5" fill="#FF9999" opacity="0.65"/>
+      <circle cx="126" cy="110" r="4.5" fill="#FF9999" opacity="0.65"/>
+    `;
+  }
+
+  if (level === 4) {
+    // Magical young fox with 3 graceful tails
+    const tailAngles = [-35, 0, 35];
+    let tails = '';
+    tailAngles.forEach(angle => {
+      tails += `<g transform="rotate(${angle} 100 118)">
+        <path d="M 92 118 C 80 88, 88 55, 100 38 C 112 55, 120 88, 108 118 Z" fill="url(#${p}-body)" opacity="0.92"/>
+        <ellipse cx="100" cy="42" rx="6.5" ry="7.5" fill="white" opacity="0.95"/>
+      </g>`;
+    });
+    return defs + `
+      <!-- 3 tails fanning behind -->
+      <g>${tails}</g>
+      <!-- Body -->
+      <ellipse cx="100" cy="108" rx="42" ry="42" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <ellipse cx="100" cy="120" rx="26" ry="20" fill="url(#${p}-belly)"/>
+      <!-- Pointy fox ears -->
+      <path d="M 70 72 Q 60 32 90 65 Z" fill="#E67E22"/>
+      <path d="M 130 72 Q 140 32 110 65 Z" fill="#E67E22"/>
+      <path d="M 73 65 Q 67 45 84 62 Z" fill="#FFD8B0"/>
+      <path d="M 127 65 Q 133 45 116 62 Z" fill="#FFD8B0"/>
+      <!-- Magic gem on forehead -->
+      <circle cx="100" cy="68" r="5" fill="#FFD93D"/>
+      <circle cx="100" cy="68" r="3" fill="#FFE17A"/>
+      <text x="100" y="71" text-anchor="middle" font-size="6" fill="#E67E22">✦</text>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="84" cy="94" rx="9.5" ry="10.5" fill="white"/>
+      <ellipse cx="116" cy="94" rx="9.5" ry="10.5" fill="white"/>
+      <ellipse cx="85" cy="96" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <ellipse cx="117" cy="96" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <circle cx="87" cy="93" r="2.2" fill="white"/>
+      <circle cx="119" cy="93" r="2.2" fill="white"/>
+      <circle cx="83" cy="98" r="0.9" fill="white"/>
+      <circle cx="115" cy="98" r="0.9" fill="white"/>
+      <!-- Cute snout -->
+      <ellipse cx="100" cy="111" rx="8" ry="5.5" fill="white"/>
+      <ellipse cx="100" cy="108" rx="2.5" ry="2" fill="#2D3436"/>
+      <!-- Smile -->
+      <path d="M 92 116 Q 100 122 108 116" stroke="#2D3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Cheek blush -->
+      <circle cx="73" cy="107" r="5" fill="#FF9999" opacity="0.65"/>
+      <circle cx="127" cy="107" r="5" fill="#FF9999" opacity="0.65"/>
+      <!-- Magical sparkles -->
+      <text x="50" y="50" font-size="11" fill="#FDCB6E">✦</text>
+      <text x="148" y="50" font-size="11" fill="#FDCB6E">✦</text>
+    `;
+  }
+
+  // === LEVEL 5: 구미호 with 9 BEAUTIFUL tails ===
+  const tailAngles = [-90, -67.5, -45, -22.5, 0, 22.5, 45, 67.5, 90];
+  let tails = '';
+  tailAngles.forEach(angle => {
+    tails += `<g transform="rotate(${angle} 100 118)">
+      <!-- Graceful tapered tail shape -->
+      <path d="M 91 118 C 76 85, 84 45, 100 22 C 116 45, 124 85, 109 118 Z" fill="url(#${p}-body)"/>
+      <!-- Subtle inner highlight -->
+      <path d="M 96 110 C 90 80, 95 50, 100 30 C 105 50, 110 80, 104 110 Z" fill="#FFCB85" opacity="0.4"/>
+      <!-- Fluffy white tip -->
+      <ellipse cx="100" cy="28" rx="7" ry="9" fill="white" opacity="0.95"/>
+      <ellipse cx="100" cy="32" rx="5" ry="4" fill="white" opacity="0.7"/>
+    </g>`;
+  });
+
+  return defs + `
+    <circle cx="100" cy="100" r="95" fill="url(#${p}-glow)"/>
+    <!-- 9 magnificent fox tails fanning behind body -->
+    <g>${tails}</g>
+    <!-- Cute fox body -->
+    <ellipse cx="100" cy="110" rx="42" ry="42" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+    <ellipse cx="100" cy="120" rx="27" ry="22" fill="url(#${p}-belly)"/>
+    <!-- Big pointy fox ears -->
+    <path d="M 68 70 Q 58 22 90 64 Z" fill="#E67E22"/>
+    <path d="M 132 70 Q 142 22 110 64 Z" fill="#E67E22"/>
+    <path d="M 71 63 Q 65 38 84 61 Z" fill="#FFD8B0"/>
+    <path d="M 129 63 Q 135 38 116 61 Z" fill="#FFD8B0"/>
+    <!-- Magic gem on forehead -->
+    <circle cx="100" cy="60" r="6" fill="#FFD93D"/>
+    <circle cx="100" cy="60" r="4" fill="#FFE17A"/>
+    <text x="100" y="63" text-anchor="middle" font-size="7" fill="#E67E22">★</text>
+    <!-- Big shiny eyes -->
+    <ellipse cx="83" cy="92" rx="11" ry="12" fill="white"/>
+    <ellipse cx="117" cy="92" rx="11" ry="12" fill="white"/>
+    <ellipse cx="84" cy="94" rx="6.5" ry="7.5" fill="#2D3436"/>
+    <ellipse cx="118" cy="94" rx="6.5" ry="7.5" fill="#2D3436"/>
+    <circle cx="86" cy="91" r="2.8" fill="white"/>
+    <circle cx="120" cy="91" r="2.8" fill="white"/>
+    <circle cx="82" cy="96" r="1.1" fill="white"/>
+    <circle cx="116" cy="96" r="1.1" fill="white"/>
+    <!-- Cute snout -->
+    <ellipse cx="100" cy="110" rx="9" ry="6" fill="white"/>
+    <ellipse cx="100" cy="107" rx="3" ry="2.3" fill="#2D3436"/>
+    <!-- Sweet smile -->
+    <path d="M 91 117 Q 100 124 109 117" stroke="#2D3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Cheek blush -->
+    <circle cx="71" cy="106" r="5.5" fill="#FF9999" opacity="0.7"/>
+    <circle cx="129" cy="106" r="5.5" fill="#FF9999" opacity="0.7"/>
+    <!-- Magical sparkles around -->
+    <text x="20" y="50" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="170" y="48" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="15" y="125" font-size="11" fill="#FDCB6E">✧</text>
+    <text x="180" y="130" font-size="11" fill="#FDCB6E">✧</text>
+    <text x="40" y="172" font-size="12" fill="#FFD93D">★</text>
+    <text x="155" y="172" font-size="12" fill="#FFD93D">★</text>
+  `;
+}
+
+// === UNICORN ===
+function drawUnicorn(level, p) {
+  const defs = commonDefs(p, '#FFC0E0', '#E84393', '#FFF0F8');
+
+  if (level === 1) {
+    return defs + `
+      <ellipse cx="100" cy="120" rx="44" ry="52" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <g opacity="0.5" fill="#FFFFFF">
+        <text x="80" y="100" font-size="14">★</text>
+        <text x="105" y="92" font-size="12">★</text>
+        <text x="92" y="120" font-size="10">★</text>
+        <text x="108" y="115" font-size="14">★</text>
+        <text x="85" y="138" font-size="12">★</text>
+        <text x="105" y="142" font-size="10">★</text>
+        <text x="92" y="155" font-size="14">★</text>
+      </g>
+      <ellipse cx="84" cy="100" rx="6" ry="14" fill="white" opacity="0.4"/>
+      <text x="100" y="128" text-anchor="middle" font-size="16" fill="#FFFFFF" opacity="0.7" font-family="Jua">zZz</text>
+    `;
+  }
+
+  if (level === 2) {
+    return defs + `
+      <ellipse cx="100" cy="125" rx="44" ry="50" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <path d="M65,100 L80,108 L72,118 L88,128 L80,140" stroke="#C2185B" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M130,95 L120,105 L128,115 L118,125 L126,135" stroke="#C2185B" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Spiral horn peeking -->
+      <path d="M 96 72 L 100 50 L 104 72 Z" fill="#FFD93D" stroke="#E8A317" stroke-width="1"/>
+      <path d="M 97 65 L 103 65 M 98 60 L 102 60" stroke="#E8A317" stroke-width="0.8"/>
+      <!-- Pink mane fluff peeking -->
+      <ellipse cx="86" cy="78" rx="4" ry="6" fill="#FF6B9D"/>
+      <ellipse cx="114" cy="78" rx="4" ry="6" fill="#FF6B9D"/>
+      <!-- Curious eyes peeking -->
+      <ellipse cx="92" cy="105" rx="4" ry="4.5" fill="white"/>
+      <ellipse cx="108" cy="105" rx="4" ry="4.5" fill="white"/>
+      <ellipse cx="92" cy="106" rx="2.5" ry="3" fill="#9B59B6"/>
+      <ellipse cx="108" cy="106" rx="2.5" ry="3" fill="#9B59B6"/>
+      <circle cx="93" cy="104" r="0.9" fill="white"/>
+      <circle cx="109" cy="104" r="0.9" fill="white"/>
+    `;
+  }
+
+  if (level === 3) {
+    return defs + `
+      <!-- Eggshell remnants -->
+      <path d="M 60 145 Q 60 170 100 170 Q 140 170 140 145 L 134 132 L 124 142 L 114 132 L 104 142 L 94 132 L 84 142 L 74 132 L 66 142 Z" fill="#FFC0E0" opacity="0.7"/>
+      <!-- Round body -->
+      <ellipse cx="100" cy="108" rx="38" ry="36" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <ellipse cx="100" cy="118" rx="23" ry="17" fill="url(#${p}-belly)"/>
+      <!-- White flowing mane -->
+      <path d="M 70 80 C 60 92, 65 102, 60 112 C 50 112, 55 122, 50 132" stroke="white" stroke-width="6" fill="none" stroke-linecap="round" opacity="0.95"/>
+      <path d="M 76 76 C 68 90, 72 100, 65 110" stroke="white" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.95"/>
+      <!-- Cute spiral horn -->
+      <path d="M 94 65 L 100 32 L 106 65 Z" fill="#FFD93D" stroke="#E8A317" stroke-width="1.5"/>
+      <path d="M 95 55 L 105 55" stroke="#E8A317" stroke-width="1.2"/>
+      <path d="M 96 47 L 104 47" stroke="#E8A317" stroke-width="1"/>
+      <path d="M 97 40 L 103 40" stroke="#E8A317" stroke-width="0.8"/>
+      <!-- Pony ears -->
+      <ellipse cx="78" cy="73" rx="5" ry="9" fill="url(#${p}-body)"/>
+      <ellipse cx="122" cy="73" rx="5" ry="9" fill="url(#${p}-body)"/>
+      <ellipse cx="78" cy="75" rx="2.5" ry="6" fill="#FF6B9D"/>
+      <ellipse cx="122" cy="75" rx="2.5" ry="6" fill="#FF6B9D"/>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="86" cy="97" rx="9" ry="10" fill="white"/>
+      <ellipse cx="114" cy="97" rx="9" ry="10" fill="white"/>
+      <ellipse cx="87" cy="99" rx="5.5" ry="6.5" fill="#9B59B6"/>
+      <ellipse cx="115" cy="99" rx="5.5" ry="6.5" fill="#9B59B6"/>
+      <ellipse cx="87" cy="100" rx="3" ry="4" fill="#2D3436"/>
+      <ellipse cx="115" cy="100" rx="3" ry="4" fill="#2D3436"/>
+      <circle cx="89" cy="96" r="2" fill="white"/>
+      <circle cx="117" cy="96" r="2" fill="white"/>
+      <circle cx="84" cy="101" r="0.9" fill="white"/>
+      <circle cx="112" cy="101" r="0.9" fill="white"/>
+      <!-- Cute snout -->
+      <ellipse cx="100" cy="113" rx="6" ry="4" fill="white"/>
+      <ellipse cx="100" cy="111" rx="2" ry="1.5" fill="#FF6B9D"/>
+      <!-- Sweet smile -->
+      <path d="M 94 117 Q 100 121 106 117" stroke="#2D3436" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <!-- Pink cheek blush -->
+      <circle cx="74" cy="110" r="4" fill="#FF6B9D" opacity="0.6"/>
+      <circle cx="126" cy="110" r="4" fill="#FF6B9D" opacity="0.6"/>
+    `;
+  }
+
+  if (level === 4) {
+    return defs + `
+      <!-- Rainbow flowing mane -->
+      <path d="M 65 75 C 50 90, 55 110, 45 125 C 35 130, 45 145, 35 158" stroke="#FF6B6B" stroke-width="7" fill="none" stroke-linecap="round"/>
+      <path d="M 70 73 C 56 88, 60 108, 50 122" stroke="#FDCB6E" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M 75 73 C 62 86, 65 105, 55 120" stroke="#00B894" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 80 73 C 68 86, 70 102, 60 115" stroke="#0984E3" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <path d="M 85 73 C 74 84, 76 100, 68 110" stroke="#9B59B6" stroke-width="4" fill="none" stroke-linecap="round"/>
+      <!-- Body -->
+      <ellipse cx="100" cy="108" rx="44" ry="44" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <ellipse cx="100" cy="120" rx="27" ry="22" fill="url(#${p}-belly)"/>
+      <!-- Long magical horn -->
+      <path d="M 92 55 L 100 16 L 108 55 Z" fill="#FFD93D" stroke="#E8A317" stroke-width="2"/>
+      <path d="M 94 42 L 106 42" stroke="#E8A317" stroke-width="1.3"/>
+      <path d="M 95 32 L 105 32" stroke="#E8A317" stroke-width="1.3"/>
+      <path d="M 96 22 L 104 22" stroke="#E8A317" stroke-width="1"/>
+      <circle cx="100" cy="18" r="2" fill="white"/>
+      <!-- Pony ears -->
+      <ellipse cx="76" cy="68" rx="6" ry="11" fill="url(#${p}-body)"/>
+      <ellipse cx="124" cy="68" rx="6" ry="11" fill="url(#${p}-body)"/>
+      <ellipse cx="76" cy="70" rx="3" ry="6" fill="#FF6B9D"/>
+      <ellipse cx="124" cy="70" rx="3" ry="6" fill="#FF6B9D"/>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="84" cy="93" rx="9.5" ry="11" fill="white"/>
+      <ellipse cx="116" cy="93" rx="9.5" ry="11" fill="white"/>
+      <ellipse cx="85" cy="95" rx="6" ry="7" fill="#9B59B6"/>
+      <ellipse cx="117" cy="95" rx="6" ry="7" fill="#9B59B6"/>
+      <ellipse cx="85" cy="96" rx="3" ry="4" fill="#2D3436"/>
+      <ellipse cx="117" cy="96" rx="3" ry="4" fill="#2D3436"/>
+      <circle cx="87" cy="92" r="2.2" fill="white"/>
+      <circle cx="119" cy="92" r="2.2" fill="white"/>
+      <circle cx="83" cy="98" r="0.9" fill="white"/>
+      <circle cx="115" cy="98" r="0.9" fill="white"/>
+      <!-- Cute snout -->
+      <ellipse cx="100" cy="111" rx="6" ry="4" fill="white"/>
+      <ellipse cx="100" cy="109" rx="2" ry="1.5" fill="#FF6B9D"/>
+      <!-- Smile -->
+      <path d="M 92 115 Q 100 121 108 115" stroke="#2D3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- Cheek blush -->
+      <circle cx="73" cy="107" r="5" fill="#FF6B9D" opacity="0.65"/>
+      <circle cx="127" cy="107" r="5" fill="#FF6B9D" opacity="0.65"/>
+      <!-- Magical sparkles -->
+      <text x="55" y="40" font-size="12" fill="#FDCB6E">✦</text>
+      <text x="135" y="48" font-size="11" fill="#FDCB6E">✦</text>
+    `;
+  }
+
+  // === LEVEL 5: Celestial Unicorn ===
+  return defs + `
+    <circle cx="100" cy="100" r="95" fill="url(#${p}-glow)"/>
+    <!-- Angelic wings -->
+    <path d="M 50 80 C 0 50, 5 145, 12 160 C 30 168, 60 130, 65 115 Z" fill="white" stroke="#FFC0E0" stroke-width="2" opacity="0.95"/>
+    <path d="M 150 80 C 200 50, 195 145, 188 160 C 170 168, 140 130, 135 115 Z" fill="white" stroke="#FFC0E0" stroke-width="2" opacity="0.95"/>
+    <path d="M 25 75 C 15 110, 25 145, 35 160" stroke="#FFC0E0" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M 175 75 C 185 110, 175 145, 165 160" stroke="#FFC0E0" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <!-- Long flowing rainbow mane -->
+    <path d="M 60 72 C 45 92, 55 115, 38 125 C 30 140, 40 155, 30 175" stroke="#FF6B6B" stroke-width="8" fill="none" stroke-linecap="round"/>
+    <path d="M 66 70 C 52 92, 60 115, 44 125 C 36 140, 46 155" stroke="#FDCB6E" stroke-width="7" fill="none" stroke-linecap="round"/>
+    <path d="M 72 68 C 58 90, 65 110, 50 125" stroke="#00B894" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 78 67 C 66 88, 70 108, 56 122" stroke="#0984E3" stroke-width="6" fill="none" stroke-linecap="round"/>
+    <path d="M 84 67 C 72 86, 74 105, 62 118" stroke="#9B59B6" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <!-- Body -->
+    <ellipse cx="100" cy="105" rx="48" ry="48" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+    <ellipse cx="100" cy="118" rx="30" ry="24" fill="url(#${p}-belly)"/>
+    <!-- Long magical golden horn -->
+    <path d="M 92 50 L 100 6 L 108 50 Z" fill="#FFD93D" stroke="#E8A317" stroke-width="2"/>
+    <path d="M 94 38 L 106 38" stroke="#E8A317" stroke-width="1.3"/>
+    <path d="M 95 28 L 105 28" stroke="#E8A317" stroke-width="1.3"/>
+    <path d="M 96 18 L 104 18" stroke="#E8A317" stroke-width="1.2"/>
+    <circle cx="100" cy="9" r="2.5" fill="white"/>
+    <!-- Halo above horn -->
+    <ellipse cx="100" cy="0" rx="22" ry="3" fill="none" stroke="#FFD93D" stroke-width="2.5"/>
+    <ellipse cx="100" cy="0" rx="22" ry="3" fill="none" stroke="#FFE17A" stroke-width="1"/>
+    <!-- Pony ears -->
+    <ellipse cx="74" cy="63" rx="7" ry="13" fill="url(#${p}-body)"/>
+    <ellipse cx="126" cy="63" rx="7" ry="13" fill="url(#${p}-body)"/>
+    <ellipse cx="74" cy="66" rx="3.5" ry="7" fill="#FF6B9D"/>
+    <ellipse cx="126" cy="66" rx="3.5" ry="7" fill="#FF6B9D"/>
+    <!-- Big sparkly purple eyes -->
+    <ellipse cx="83" cy="92" rx="11" ry="12" fill="white"/>
+    <ellipse cx="117" cy="92" rx="11" ry="12" fill="white"/>
+    <ellipse cx="84" cy="94" rx="6.5" ry="8" fill="#9B59B6"/>
+    <ellipse cx="118" cy="94" rx="6.5" ry="8" fill="#9B59B6"/>
+    <ellipse cx="84" cy="95" rx="3.5" ry="5" fill="#2D3436"/>
+    <ellipse cx="118" cy="95" rx="3.5" ry="5" fill="#2D3436"/>
+    <circle cx="86" cy="91" r="2.5" fill="white"/>
+    <circle cx="120" cy="91" r="2.5" fill="white"/>
+    <circle cx="82" cy="97" r="1.1" fill="white"/>
+    <circle cx="116" cy="97" r="1.1" fill="white"/>
+    <!-- Star on forehead -->
+    <text x="100" y="80" text-anchor="middle" font-size="11" fill="#FDCB6E">★</text>
+    <!-- Cute snout -->
+    <ellipse cx="100" cy="110" rx="7" ry="5" fill="white"/>
+    <ellipse cx="100" cy="108" rx="2.5" ry="2" fill="#FF6B9D"/>
+    <!-- Sweet smile -->
+    <path d="M 91 116 Q 100 124 109 116" stroke="#2D3436" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+    <!-- Big pink cheek blush -->
+    <circle cx="71" cy="105" r="6" fill="#FF6B9D" opacity="0.7"/>
+    <circle cx="129" cy="105" r="6" fill="#FF6B9D" opacity="0.7"/>
+    <!-- Magical sparkles -->
+    <text x="20" y="55" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="170" y="50" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="15" y="125" font-size="12" fill="#FFC0E0">★</text>
+    <text x="180" y="130" font-size="12" fill="#FFC0E0">★</text>
+    <text x="40" y="170" font-size="12" fill="#FDCB6E">✧</text>
+    <text x="155" y="170" font-size="12" fill="#FDCB6E">✧</text>
+  `;
+}
+
+// === PENGUIN ===
+function drawPenguin(level, p) {
+  const defs = commonDefs(p, '#74B9FF', '#0984E3', '#FFFFFF');
+
+  if (level === 1) {
+    return defs + `
+      <ellipse cx="100" cy="120" rx="44" ry="52" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <g opacity="0.55" fill="#FFFFFF">
+        <text x="80" y="100" font-size="12">❄</text>
+        <text x="108" y="92" font-size="14">❄</text>
+        <text x="92" y="120" font-size="10">❄</text>
+        <text x="115" y="115" font-size="12">❄</text>
+        <text x="78" y="135" font-size="10">❄</text>
+        <text x="100" y="142" font-size="14">❄</text>
+        <text x="115" y="138" font-size="10">❄</text>
+        <text x="88" y="155" font-size="12">❄</text>
+      </g>
+      <ellipse cx="84" cy="100" rx="6" ry="14" fill="white" opacity="0.4"/>
+      <text x="100" y="125" text-anchor="middle" font-size="16" fill="#FFFFFF" opacity="0.8" font-family="Jua">zZz</text>
+    `;
+  }
+
+  if (level === 2) {
+    return defs + `
+      <ellipse cx="100" cy="125" rx="44" ry="50" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <path d="M65,100 L80,108 L72,118 L88,128 L80,140" stroke="#0D47A1" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <path d="M130,95 L120,105 L128,115 L118,125 L126,135" stroke="#0D47A1" stroke-width="3" fill="none" stroke-linecap="round"/>
+      <!-- Cute orange beak peeking -->
+      <path d="M 94 80 L 100 70 L 106 80 L 100 90 Z" fill="#FDCB6E" stroke="#E8A317" stroke-width="1"/>
+      <!-- Curious eyes peeking -->
+      <ellipse cx="91" cy="100" rx="4" ry="4.5" fill="white"/>
+      <ellipse cx="109" cy="100" rx="4" ry="4.5" fill="white"/>
+      <ellipse cx="92" cy="101" rx="2.5" ry="3" fill="#2D3436"/>
+      <ellipse cx="110" cy="101" rx="2.5" ry="3" fill="#2D3436"/>
+      <circle cx="93" cy="99" r="0.9" fill="white"/>
+      <circle cx="111" cy="99" r="0.9" fill="white"/>
+    `;
+  }
+
+  if (level === 3) {
+    return defs + `
+      <!-- Eggshell -->
+      <path d="M 60 148 Q 60 170 100 170 Q 140 170 140 148 L 134 135 L 124 145 L 114 135 L 104 145 L 94 135 L 84 145 L 74 135 L 66 145 Z" fill="#74B9FF" opacity="0.7"/>
+      <!-- Round penguin body -->
+      <ellipse cx="100" cy="108" rx="40" ry="42" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <!-- Big white belly -->
+      <ellipse cx="100" cy="115" rx="28" ry="30" fill="white"/>
+      <!-- Cute round flipper wings -->
+      <ellipse cx="58" cy="108" rx="9" ry="20" fill="url(#${p}-body)" transform="rotate(-15 58 108)"/>
+      <ellipse cx="142" cy="108" rx="9" ry="20" fill="url(#${p}-body)" transform="rotate(15 142 108)"/>
+      <!-- Cute webbed feet -->
+      <path d="M 80 148 L 78 158 L 86 158 L 88 152 L 92 158 L 96 152 L 92 148 Z" fill="#FDCB6E"/>
+      <path d="M 108 148 L 104 152 L 108 158 L 112 152 L 116 158 L 120 158 L 118 148 Z" fill="#FDCB6E"/>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="86" cy="92" rx="8" ry="9" fill="white"/>
+      <ellipse cx="114" cy="92" rx="8" ry="9" fill="white"/>
+      <ellipse cx="87" cy="94" rx="5" ry="5.5" fill="#2D3436"/>
+      <ellipse cx="115" cy="94" rx="5" ry="5.5" fill="#2D3436"/>
+      <circle cx="89" cy="91" r="2" fill="white"/>
+      <circle cx="117" cy="91" r="2" fill="white"/>
+      <circle cx="84" cy="96" r="0.8" fill="white"/>
+      <circle cx="112" cy="96" r="0.8" fill="white"/>
+      <!-- Tiny cute beak -->
+      <path d="M 95 102 L 105 102 L 100 112 Z" fill="#FDCB6E" stroke="#E8A317" stroke-width="1.2"/>
+      <!-- Cheek blush -->
+      <circle cx="76" cy="100" r="4" fill="#FF9999" opacity="0.6"/>
+      <circle cx="124" cy="100" r="4" fill="#FF9999" opacity="0.6"/>
+    `;
+  }
+
+  if (level === 4) {
+    return defs + `
+      <!-- Body -->
+      <ellipse cx="100" cy="108" rx="44" ry="46" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+      <!-- White belly -->
+      <ellipse cx="100" cy="115" rx="32" ry="34" fill="white"/>
+      <!-- Flipper wings -->
+      <ellipse cx="55" cy="110" rx="10" ry="22" fill="url(#${p}-body)" transform="rotate(-18 55 110)"/>
+      <ellipse cx="145" cy="110" rx="10" ry="22" fill="url(#${p}-body)" transform="rotate(18 145 110)"/>
+      <!-- Cute webbed feet -->
+      <path d="M 78 158 L 76 168 L 84 168 L 86 162 L 90 168 L 94 162 L 90 158 Z" fill="#FDCB6E"/>
+      <path d="M 110 158 L 106 162 L 110 168 L 114 162 L 118 168 L 122 168 L 120 158 Z" fill="#FDCB6E"/>
+      <!-- Cute red scarf -->
+      <path d="M 70 118 Q 100 128 130 118 L 130 132 Q 100 140 70 132 Z" fill="#FF6B6B"/>
+      <path d="M 125 130 L 138 152 L 130 154 L 120 137" fill="#FF6B6B"/>
+      <path d="M 75 130 L 65 152 L 72 154 L 78 137" fill="#FF6B6B"/>
+      <path d="M 70 122 Q 100 132 130 122" stroke="#C0392B" stroke-width="0.8" fill="none" opacity="0.6"/>
+      <!-- Big sparkly eyes -->
+      <ellipse cx="84" cy="86" rx="9" ry="10" fill="white"/>
+      <ellipse cx="116" cy="86" rx="9" ry="10" fill="white"/>
+      <ellipse cx="85" cy="88" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <ellipse cx="117" cy="88" rx="5.5" ry="6.5" fill="#2D3436"/>
+      <circle cx="87" cy="85" r="2.2" fill="white"/>
+      <circle cx="119" cy="85" r="2.2" fill="white"/>
+      <circle cx="83" cy="90" r="0.9" fill="white"/>
+      <circle cx="115" cy="90" r="0.9" fill="white"/>
+      <!-- Cute beak -->
+      <path d="M 93 96 L 107 96 L 100 110 Z" fill="#FDCB6E" stroke="#E8A317" stroke-width="1.5"/>
+      <!-- Cheek blush -->
+      <circle cx="74" cy="96" r="4.5" fill="#FF9999" opacity="0.6"/>
+      <circle cx="126" cy="96" r="4.5" fill="#FF9999" opacity="0.6"/>
+      <!-- Tiny ice crown -->
+      <path d="M 84 60 L 90 45 L 96 60 L 100 42 L 104 60 L 110 45 L 116 60 Z" fill="#74B9FF" stroke="#0984E3" stroke-width="1.5" opacity="0.9"/>
+      <circle cx="100" cy="48" r="1.5" fill="white"/>
+    `;
+  }
+
+  // === LEVEL 5: Emperor Penguin ===
+  return defs + `
+    <circle cx="100" cy="100" r="95" fill="url(#${p}-glow)"/>
+    <!-- Magnificent ice wings -->
+    <path d="M 48 88 C 0 60, -5 150, 8 165 C 28 170, 58 130, 62 118 Z" fill="#E0F4FF" stroke="#74B9FF" stroke-width="2" opacity="0.9"/>
+    <path d="M 152 88 C 200 60, 205 150, 192 165 C 172 170, 142 130, 138 118 Z" fill="#E0F4FF" stroke="#74B9FF" stroke-width="2" opacity="0.9"/>
+    <path d="M 18 80 C 8 115, 22 150, 35 165" stroke="#74B9FF" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M 35 95 C 25 125, 35 155, 48 165" stroke="#74B9FF" stroke-width="1" fill="none" opacity="0.5"/>
+    <path d="M 182 80 C 192 115, 178 150, 165 165" stroke="#74B9FF" stroke-width="1.5" fill="none" opacity="0.7"/>
+    <path d="M 165 95 C 175 125, 165 155, 152 165" stroke="#74B9FF" stroke-width="1" fill="none" opacity="0.5"/>
+    <!-- Body -->
+    <ellipse cx="100" cy="108" rx="50" ry="52" fill="url(#${p}-body)" filter="url(#${p}-shadow)"/>
+    <!-- Big white belly -->
+    <ellipse cx="100" cy="118" rx="36" ry="38" fill="white"/>
+    <text x="100" y="135" text-anchor="middle" font-size="22" fill="#FDCB6E">★</text>
+    <!-- Royal flippers -->
+    <ellipse cx="51" cy="110" rx="11" ry="24" fill="url(#${p}-body)" transform="rotate(-22 51 110)"/>
+    <ellipse cx="149" cy="110" rx="11" ry="24" fill="url(#${p}-body)" transform="rotate(22 149 110)"/>
+    <!-- Cute royal webbed feet -->
+    <path d="M 76 162 L 74 175 L 84 175 L 87 168 L 92 175 L 96 168 L 92 162 Z" fill="#FDCB6E" stroke="#E8A317" stroke-width="1"/>
+    <path d="M 108 162 L 104 168 L 108 175 L 113 168 L 116 175 L 126 175 L 124 162 Z" fill="#FDCB6E" stroke="#E8A317" stroke-width="1"/>
+    <!-- Royal red cape -->
+    <path d="M 55 95 Q 100 125 145 95 L 148 165 L 132 168 L 122 162 L 112 168 L 100 162 L 88 168 L 78 162 L 68 168 L 52 165 Z" fill="#FF6B6B" opacity="0.9"/>
+    <path d="M 60 100 Q 100 128 140 100" stroke="#C0392B" stroke-width="1" fill="none" opacity="0.4"/>
+    <!-- Big elegant golden crown -->
+    <path d="M 70 52 C 76 18, 86 14, 90 42 C 96 8, 104 8, 110 42 C 114 14, 124 18, 130 52 Z" fill="#FFD93D" stroke="#E8A317" stroke-width="2"/>
+    <rect x="70" y="52" width="60" height="6" rx="2" fill="#FDCB6E" stroke="#E8A317" stroke-width="1.8"/>
+    <!-- Crown jewels -->
+    <circle cx="100" cy="22" r="3.5" fill="#FF6B6B"/>
+    <circle cx="86" cy="32" r="2.5" fill="#74B9FF"/>
+    <circle cx="114" cy="32" r="2.5" fill="#74B9FF"/>
+    <circle cx="78" cy="55" r="2" fill="#00CEC9"/>
+    <circle cx="100" cy="55" r="2.2" fill="#FF9999"/>
+    <circle cx="122" cy="55" r="2" fill="#00CEC9"/>
+    <!-- Big sparkly eyes -->
+    <ellipse cx="82" cy="84" rx="10" ry="11" fill="white"/>
+    <ellipse cx="118" cy="84" rx="10" ry="11" fill="white"/>
+    <ellipse cx="83" cy="86" rx="6" ry="7" fill="#2D3436"/>
+    <ellipse cx="119" cy="86" rx="6" ry="7" fill="#2D3436"/>
+    <circle cx="85" cy="83" r="2.5" fill="white"/>
+    <circle cx="121" cy="83" r="2.5" fill="white"/>
+    <circle cx="81" cy="88" r="1" fill="white"/>
+    <circle cx="117" cy="88" r="1" fill="white"/>
+    <!-- Royal beak -->
+    <path d="M 92 95 L 108 95 L 100 113 Z" fill="#FDCB6E" stroke="#E8A317" stroke-width="2"/>
+    <!-- Cheek blush -->
+    <circle cx="69" cy="98" r="5.5" fill="#FF9999" opacity="0.65"/>
+    <circle cx="131" cy="98" r="5.5" fill="#FF9999" opacity="0.65"/>
+    <!-- Magical sparkles + snowflakes -->
+    <text x="20" y="55" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="170" y="50" font-size="14" fill="#FDCB6E">✦</text>
+    <text x="40" y="170" font-size="13" fill="#74B9FF">❄</text>
+    <text x="155" y="170" font-size="13" fill="#74B9FF">❄</text>
+    <text x="15" y="120" font-size="11" fill="#FFFFFF">❄</text>
+    <text x="180" y="125" font-size="11" fill="#FFFFFF">❄</text>
+  `;
+}
+
+const CHARACTERS = {
+  dragon: {
+    key: 'dragon',
+    name: '드래곤',
+    eggLabel: '보랏빛 알',
+    eggHint: '신비로운 보라색 빛이 감돌아요',
+    titles: [
+      '신비한 보랏빛 알이에요',
+      '뭔가 깨어나려고 해요!',
+      '귀여운 아기 드래곤',
+      '용맹한 청년 드래곤',
+      '🔥 전설의 드래곤 로드!'
+    ],
+    draw: drawDragon
+  },
+  fox: {
+    key: 'fox',
+    name: '여우',
+    eggLabel: '주황빛 알',
+    eggHint: '따뜻한 주황색 빛이 감돌아요',
+    titles: [
+      '신비한 주황빛 알이에요',
+      '뭔가 깨어나려고 해요!',
+      '귀여운 아기 여우',
+      '신비한 마법 여우',
+      '✨ 전설의 구미호!'
+    ],
+    draw: drawFox
+  },
+  unicorn: {
+    key: 'unicorn',
+    name: '유니콘',
+    eggLabel: '분홍빛 알',
+    eggHint: '꿈결같은 분홍색 빛이 감돌아요',
+    titles: [
+      '신비한 분홍빛 알이에요',
+      '뭔가 깨어나려고 해요!',
+      '귀여운 아기 유니콘',
+      '무지개 유니콘',
+      '🌈 천상의 유니콘!'
+    ],
+    draw: drawUnicorn
+  },
+  penguin: {
+    key: 'penguin',
+    name: '펭귄',
+    eggLabel: '푸른빛 알',
+    eggHint: '시원한 파란색 빛이 감돌아요',
+    titles: [
+      '신비한 푸른빛 알이에요',
+      '뭔가 깨어나려고 해요!',
+      '귀여운 아기 펭귄',
+      '모험가 펭귄',
+      '👑 황제 펭귄!'
+    ],
+    draw: drawPenguin
+  }
+};
+
+function getCharacterSVG(charType, level, prefix) {
+  const char = CHARACTERS[charType];
+  if (!char) return '';
+  const p = prefix || (charType + level);
+  return `
+    <svg viewBox="0 0 200 200" class="character-svg" xmlns="http://www.w3.org/2000/svg">
+      ${char.draw(level, p)}
+    </svg>
+  `;
+}
+
+// ===== DATA =====
+function getDefaultData() {
+  return {
+    currentChar: null, // { type, name, points }
+    completed: [], // [{ type, name, completedAt }]
+    history: []
+  };
+}
+
+function loadData() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : getDefaultData();
+  } catch { return getDefaultData(); }
+}
+
+function saveData(d) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(d));
+}
+
+let data = loadData();
+let selectedPoints = 2;
+
+function getStage(pts) {
+  for (let i = STAGES.length - 1; i >= 0; i--) {
+    if (pts >= STAGES[i].minPts) return STAGES[i];
+  }
+  return STAGES[0];
+}
+
+// 한국어 조사 자동 선택 (받침 유무 판별)
+function getParticle(name, withConsonant, withoutConsonant) {
+  if (!name) return withConsonant;
+  const lastChar = name[name.length - 1];
+  const code = lastChar.charCodeAt(0);
+  // 한글 음절 범위 (가 ~ 힣)
+  if (code >= 0xAC00 && code <= 0xD7A3) {
+    const hasConsonant = (code - 0xAC00) % 28 !== 0;
+    return hasConsonant ? withConsonant : withoutConsonant;
+  }
+  return withConsonant;
+}
+
+function getStreak() {
+  if (data.history.length === 0) return 0;
+  const days = new Set();
+  data.history.forEach(h => days.add(new Date(h.date).toDateString()));
+  const sortedDays = [...days].map(d => new Date(d)).sort((a, b) => b - a);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const lastDay = sortedDays[0];
+  const lastDayNorm = new Date(lastDay.getFullYear(), lastDay.getMonth(), lastDay.getDate());
+  if (lastDayNorm < yesterday) return 0;
+  let streak = 1;
+  for (let i = 0; i < sortedDays.length - 1; i++) {
+    const curr = sortedDays[i];
+    const prev = sortedDays[i + 1];
+    const diff = Math.round((curr - prev) / (1000 * 60 * 60 * 24));
+    if (diff === 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+// ===== SIGNATURE PAD =====
+let sigCanvas, sigCtx, sigDrawing = false, sigHasDrawn = false;
+
+function initSignaturePad() {
+  sigCanvas = document.getElementById('signatureCanvas');
+  if (!sigCanvas) return;
+  const resize = () => {
+    const rect = sigCanvas.getBoundingClientRect();
+    if (rect.width === 0) return;
+    const dpr = window.devicePixelRatio || 1;
+    sigCanvas.width = rect.width * dpr;
+    sigCanvas.height = rect.height * dpr;
+    sigCtx = sigCanvas.getContext('2d');
+    sigCtx.scale(dpr, dpr);
+    sigCtx.lineWidth = 2.5;
+    sigCtx.lineCap = 'round';
+    sigCtx.lineJoin = 'round';
+    sigCtx.strokeStyle = '#2D3436';
+  };
+  resize();
+  window.addEventListener('resize', resize);
+
+  const getPos = (e) => {
+    const rect = sigCanvas.getBoundingClientRect();
+    if (e.touches && e.touches[0]) {
+      return { x: e.touches[0].clientX - rect.left, y: e.touches[0].clientY - rect.top };
+    }
+    return { x: e.clientX - rect.left, y: e.clientY - rect.top };
+  };
+  const startDraw = (e) => {
+    e.preventDefault();
+    sigDrawing = true; sigHasDrawn = true;
+    const pos = getPos(e);
+    sigCtx.beginPath();
+    sigCtx.moveTo(pos.x, pos.y);
+  };
+  const draw = (e) => {
+    if (!sigDrawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    sigCtx.lineTo(pos.x, pos.y);
+    sigCtx.stroke();
+  };
+  const endDraw = (e) => { e.preventDefault(); sigDrawing = false; };
+
+  sigCanvas.addEventListener('mousedown', startDraw);
+  sigCanvas.addEventListener('mousemove', draw);
+  sigCanvas.addEventListener('mouseup', endDraw);
+  sigCanvas.addEventListener('mouseleave', endDraw);
+  sigCanvas.addEventListener('touchstart', startDraw, { passive: false });
+  sigCanvas.addEventListener('touchmove', draw, { passive: false });
+  sigCanvas.addEventListener('touchend', endDraw, { passive: false });
+}
+
+function clearSignature() {
+  if (!sigCtx) return;
+  sigCtx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+  sigHasDrawn = false;
+}
+
+function getSignatureData() {
+  if (!sigHasDrawn) return null;
+  return sigCanvas.toDataURL('image/png');
+}
+
+// ===== RENDER =====
+function renderCharacterSVG(charType, level) {
+  const container = document.getElementById('characterDisplay');
+  container.innerHTML = getCharacterSVG(charType, level, 'main');
+}
+
+function updateDisplay() {
+  // No current character → show character selection
+  if (!data.currentChar) {
+    document.getElementById('headerTitle').textContent = '🌟 캐릭터 키우기';
+    document.getElementById('headerDesc').textContent = '알을 깨우고 캐릭터를 성장시켜보세요!';
+    openCharSelect(false);
+    return;
+  }
+
+  const char = CHARACTERS[data.currentChar.type];
+  const points = data.currentChar.points;
+  const stage = getStage(points);
+  const streak = getStreak();
+  const charName = data.currentChar.name;
+
+  // Header text with Korean particles (은/는, 을/를)
+  const eunNun = getParticle(charName, '은', '는');
+  const eulRul = getParticle(charName, '을', '를');
+  document.getElementById('headerTitle').textContent = `🌟 ${charName} 키우기`;
+  document.getElementById('headerDesc').textContent =
+    `${charName}${eunNun} 칭찬을 먹고 무럭무럭 자라납니다. 수업을 열심히 들어 ${charName}${eulRul} 성장시켜보아요!`;
+
+  document.getElementById('stageName').textContent = stage.name;
+  document.getElementById('charName').textContent = charName;
+  document.getElementById('charTitle').textContent = char.titles[stage.level - 1];
+  document.getElementById('levelBadge').textContent = `Lv.${stage.level}`;
+  document.getElementById('totalPoints').textContent = points;
+
+  // Collection counter
+  const collectionEl = document.getElementById('collectionInfo');
+  const completedTypes = new Set(data.completed.map(c => c.type));
+  collectionEl.textContent = `🏆 수집: ${completedTypes.size} / 4`;
+
+  // Streak
+  const streakArea = document.getElementById('streakArea');
+  if (streak >= 2) {
+    streakArea.innerHTML = `<div class="streak-badge">🔥 ${streak}일 연속 칭찬 중!</div>`;
+  } else {
+    streakArea.innerHTML = '';
+  }
+
+  // EXP Bar
+  const ptsInStage = points - stage.minPts;
+  const stageRange = stage.maxPts - stage.minPts;
+  const pct = Math.min(100, (ptsInStage / stageRange) * 100);
+  document.getElementById('expBar').style.width = pct + '%';
+
+  const remaining = stage.maxPts - points;
+  document.getElementById('expText').textContent =
+    points >= MAX_POINTS ? '🎉 완전체 달성!' : `다음 레벨까지 ${remaining}P`;
+
+  renderCharacterSVG(data.currentChar.type, stage.level);
+
+  // Stats
+  document.getElementById('statTotal').textContent = data.history.length;
+  const today = new Date().toDateString();
+  document.getElementById('statToday').textContent =
+    data.history.filter(h => new Date(h.date).toDateString() === today).length;
+  document.getElementById('statStreak').textContent = streak;
+
+  renderHistory('recentHistory', 30);
+  renderHistory('fullHistory', 100);
+  renderCategories();
+  renderHallOfFame();
+
+  document.getElementById('charNameInput').value = data.currentChar.name;
+}
+
+function renderHistory(containerId, limit) {
+  const container = document.getElementById(containerId);
+  const items = [...data.history].reverse().slice(0, limit);
+
+  if (items.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state">
+        <div class="icon">📭</div>
+        <p>아직 칭찬 기록이 없어요<br>우리 반의 첫 번째 칭찬을 기록해보세요!</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = items.map(h => {
+    const emoji = PRAISE_EMOJIS[h.reason] || '⭐';
+    const d = new Date(h.date);
+    const dateStr = `${d.getMonth()+1}/${d.getDate()} ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+    const sigImg = h.signature ? `<img class="sig-img" src="${h.signature}" alt="서명">` : '';
+    return `
+      <div class="history-item">
+        <div class="emoji">${emoji}</div>
+        <div class="info">
+          <div class="reason">${h.reason}</div>
+          <div class="date">${dateStr}</div>
+        </div>
+        ${sigImg}
+        <div class="points">+${h.points}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderCategories() {
+  const container = document.getElementById('categoryList');
+  const counts = {};
+  data.history.forEach(h => { counts[h.reason] = (counts[h.reason] || 0) + 1; });
+
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  if (sorted.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="icon">📊</div><p>아직 통계가 없어요</p></div>`;
+    return;
+  }
+
+  const maxCount = sorted[0][1];
+  container.innerHTML = sorted.map(([reason, count]) => {
+    const emoji = PRAISE_EMOJIS[reason] || '⭐';
+    const pct = Math.round((count / maxCount) * 100);
+    return `
+      <div class="category-item">
+        <div class="cat-emoji">${emoji}</div>
+        <div class="cat-info">
+          <div class="cat-name">${reason}</div>
+          <div class="cat-bar-bg"><div class="cat-bar" style="width:${pct}%"></div></div>
+        </div>
+        <div class="cat-count">${count}회</div>
+      </div>`;
+  }).join('');
+}
+
+function renderHallOfFame() {
+  const container = document.getElementById('hallOfFameSection');
+  if (data.completed.length === 0) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding: 30px 20px;">
+        <div class="icon">🏆</div>
+        <p>아직 완성한 캐릭터가 없어요<br>첫 번째 캐릭터를 끝까지 키워보세요!</p>
+      </div>
+    `;
+    return;
+  }
+  const cards = data.completed.map((c, i) => {
+    const charSvg = getCharacterSVG(c.type, 5, 'fame' + i);
+    const d = new Date(c.completedAt);
+    const dateStr = `${d.getFullYear()}.${d.getMonth()+1}.${d.getDate()}`;
+    return `
+      <div class="fame-card">
+        <div class="fame-svg-wrap">${charSvg}</div>
+        <div class="fame-name">${c.name}</div>
+        <div class="fame-date">${dateStr} 완성</div>
+      </div>
+    `;
+  }).join('');
+  container.innerHTML = `
+    <div class="hall-of-fame">
+      <h4>🏆 우리 반의 명예의 전당</h4>
+      <div class="fame-grid">${cards}</div>
+    </div>
+  `;
+}
+
+// ===== ACTIONS =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.getAttribute('onclick').includes(tab));
+  });
+  document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+
+  // Re-init signature pad when entering main tab (canvas is in main now)
+  if (tab === 'home') {
+    setTimeout(() => {
+      const c = document.getElementById('signatureCanvas');
+      if (c && c.getBoundingClientRect().width > 0) {
+        initSignaturePad();
+      }
+    }, 50);
+  }
+}
+
+function selectPoints(el) {
+  document.querySelectorAll('.point-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedPoints = parseInt(el.dataset.points);
+}
+
+document.querySelectorAll('.quick-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+    btn.classList.add('selected');
+    document.getElementById('praiseReason').value = btn.dataset.reason;
+  });
+});
+
+function givePraise() {
+  if (!data.currentChar) {
+    alert('먼저 캐릭터를 선택해주세요!');
+    openCharSelect(false);
+    return;
+  }
+  const reason = document.getElementById('praiseReason').value.trim();
+  if (!reason) { alert('칭찬 이유를 입력해주세요!'); return; }
+
+  const signature = getSignatureData();
+  if (!signature) { alert('선생님 서명을 해주세요! ✍️'); return; }
+
+  const oldStage = getStage(data.currentChar.points);
+
+  data.history.push({
+    reason,
+    points: selectedPoints,
+    signature,
+    charType: data.currentChar.type,
+    date: new Date().toISOString()
+  });
+  data.currentChar.points = Math.min(MAX_POINTS, data.currentChar.points + selectedPoints);
+  saveData(data);
+
+  const newStage = getStage(data.currentChar.points);
+  spawnParticles();
+
+  // Check for completion (max points reached)
+  if (data.currentChar.points >= MAX_POINTS) {
+    document.getElementById('praiseReason').value = '';
+    document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+    clearSignature();
+    showCompletion();
+    return;
+  }
+
+  if (newStage.level > oldStage.level) {
+    showLevelUp(newStage);
+  }
+
+  document.getElementById('praiseReason').value = '';
+  document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('selected'));
+  clearSignature();
+  updateDisplay();
+}
+
+function showLevelUp(stage) {
+  const char = CHARACTERS[data.currentChar.type];
+  document.getElementById('modalTitle').textContent = `레벨 ${stage.level} 달성!`;
+  document.getElementById('modalDesc').textContent = `${data.currentChar.name}가 "${stage.name}" 단계로 성장했어요!`;
+  document.getElementById('modalChar').innerHTML = getCharacterSVG(data.currentChar.type, stage.level, 'lvl');
+  document.getElementById('levelUpModal').classList.add('show');
+}
+
+function showCompletion() {
+  const charName = data.currentChar.name;
+  const eulRul = getParticle(charName, '을', '를');
+  document.getElementById('completionDesc').textContent =
+    `${charName}${eulRul} 완전히 키워냈어요!`;
+  document.getElementById('completedCharSvg').innerHTML =
+    getCharacterSVG(data.currentChar.type, 5, 'complete');
+
+  // Confetti!
+  for (let i = 0; i < 30; i++) {
+    setTimeout(() => spawnParticles(), i * 50);
+  }
+
+  document.getElementById('completionModal').classList.add('show');
+}
+
+function afterCompletion() {
+  // Move current char to completed
+  data.completed.push({
+    type: data.currentChar.type,
+    name: data.currentChar.name,
+    completedAt: new Date().toISOString()
+  });
+  data.currentChar = null;
+  saveData(data);
+
+  closeModal('completionModal');
+  openCharSelect(false);
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  if (id === 'completionModal') {
+    updateDisplay();
+  } else {
+    updateDisplay();
+  }
+}
+
+function spawnParticles() {
+  const emojis = ['⭐', '✨', '🌟', '💫', '🎉', '🎊'];
+  for (let i = 0; i < 8; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+    p.style.left = (Math.random() * 80 + 10) + 'vw';
+    p.style.top = (Math.random() * 40 + 30) + 'vh';
+    document.body.appendChild(p);
+    setTimeout(() => p.remove(), 1500);
+  }
+}
+
+function saveCharName() {
+  if (!data.currentChar) return;
+  const name = document.getElementById('charNameInput').value.trim();
+  if (name) {
+    data.currentChar.name = name;
+    saveData(data);
+    updateDisplay();
+  }
+}
+
+function openStatsModal() {
+  document.getElementById('statsModal').classList.add('show');
+}
+
+function openSettings() {
+  document.getElementById('settingsModal').classList.add('show');
+}
+
+function openHallOfFame() {
+  document.getElementById('hallOfFameModal').classList.add('show');
+}
+
+function openPreview() {
+  if (!data.currentChar) return;
+  const grid = document.getElementById('previewGrid');
+  const points = data.currentChar.points;
+  const currentStage = getStage(points);
+
+  document.getElementById('previewSubtitle').textContent =
+    `우리 캐릭터의 5단계 성장 과정을 확인해보세요!`;
+
+  grid.innerHTML = STAGES.map(s => {
+    const unlocked = points >= s.minPts;
+    const isCurrent = s.level === currentStage.level;
+    const cls = isCurrent ? 'current' : (unlocked ? 'unlocked' : 'locked');
+    const currentLabel = isCurrent ? '<div class="current-label">현재</div>' : '';
+    const charContent = unlocked
+      ? `<div class="preview-char-wrap">${getCharacterSVG(data.currentChar.type, s.level, 'pv' + s.level)}</div>`
+      : `<div class="preview-char-wrap question-mark">?</div>`;
+    const stageName = unlocked ? s.name : '???';
+    return `
+      <div class="preview-card ${cls}">
+        ${currentLabel}
+        ${charContent}
+        <div class="stage-level">Lv.${s.level}</div>
+        <div class="stage-name-text">${stageName}</div>
+        <div class="stage-pts">${s.minPts}P 부터</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('previewModal').classList.add('show');
+}
+
+function openCharSelect(canClose) {
+  const grid = document.getElementById('charSelectGrid');
+  const completedTypes = new Set(data.completed.map(c => c.type));
+
+  document.getElementById('selectTitle').textContent = data.currentChar
+    ? '🐣 어떤 알을 키울까요?'
+    : '🐣 마음에 드는 알을 골라보세요!';
+  document.getElementById('selectSubtitle').textContent =
+    `안에 무엇이 있을지는 깨어나봐야 알 수 있어요!  (${completedTypes.size}/4 발견)`;
+
+  document.getElementById('selectCloseBtn').style.display = canClose ? 'block' : 'none';
+
+  // Shuffle order so position doesn't reveal identity (but stable per session)
+  grid.innerHTML = Object.values(CHARACTERS).map(c => {
+    const isCompleted = completedTypes.has(c.key);
+    const eggSvg = getCharacterSVG(c.key, 1, 'sel' + c.key);
+    // Show real name only if already discovered
+    const displayName = isCompleted ? `${c.name} (${c.eggLabel})` : c.eggLabel;
+    const displayDesc = isCompleted ? '✓ 이미 키워본 친구예요' : c.eggHint;
+    const badge = isCompleted ? '<div style="position:absolute; top:8px; right:8px; background:#FFD4A3; color:#B8860B; font-size:0.65rem; padding:2px 8px; border-radius:10px; font-weight:700;">발견함</div>' : '<div style="position:absolute; top:8px; right:8px; background:#A8E6C3; color:#4FB585; font-size:0.65rem; padding:2px 8px; border-radius:10px; font-weight:700;">❓</div>';
+    return `
+      <div class="char-select-card" style="position:relative;" onclick="pickCharacter('${c.key}')">
+        ${badge}
+        <div class="select-svg-wrap">${eggSvg}</div>
+        <div class="select-name">${displayName}</div>
+        <div class="select-desc">${displayDesc}</div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('charSelectModal').classList.add('show');
+}
+
+function pickCharacter(type) {
+  const char = CHARACTERS[type];
+  const defaultName = '무럭이';
+  const name = prompt(`${char.eggLabel}을 골랐어요! 🥚\n이 알의 이름을 지어주세요 (안에 뭐가 있을지는 비밀!)`, defaultName) || defaultName;
+
+  data.currentChar = {
+    type: type,
+    name: name.trim() || defaultName,
+    points: 0
+  };
+  saveData(data);
+  closeModal('charSelectModal');
+  updateDisplay();
+}
+
+function exportData() {
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `우리반_캐릭터_백업_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importData(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const imported = JSON.parse(e.target.result);
+      if (imported.history !== undefined) {
+        data = imported;
+        // Migration for missing fields
+        if (!data.completed) data.completed = [];
+        // Remove deprecated rewards field if exists
+        delete data.rewards;
+        saveData(data);
+        updateDisplay();
+        alert('데이터를 성공적으로 불러왔습니다!');
+      } else {
+        alert('올바른 백업 파일이 아닙니다.');
+      }
+    } catch { alert('파일을 읽을 수 없습니다.'); }
+  };
+  reader.readAsText(file);
+}
+
+function resetAll() {
+  if (confirm('정말 모든 데이터를 초기화할까요?\n이 작업은 되돌릴 수 없습니다!')) {
+    if (confirm('정말로요? 모든 칭찬 기록과 수집한 캐릭터가 사라집니다!')) {
+      data = getDefaultData();
+      saveData(data);
+      updateDisplay();
+    }
+  }
+}
+
+updateDisplay();
+initSignaturePad();
+</script>
+</body>
+</html>

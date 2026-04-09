@@ -2720,12 +2720,12 @@ function updateDisplay() {
   const streak = getStreak();
   const charName = data.currentChar.name;
 
-  // Header text with Korean particles (은/는, 을/를)
-  const eunNun = getParticle(charName, '은', '는');
-  const eulRul = getParticle(charName, '을', '를');
+  // Header text with Korean particles (받침 있으면 "이는/이를", 없으면 "는/를")
+  const iNun = getParticle(charName, '이는', '는');
+  const iRul = getParticle(charName, '이를', '를');
   document.getElementById('headerTitle').textContent = `🌟 ${charName} 키우기`;
   document.getElementById('headerDesc').textContent =
-    `${charName}${eunNun} 칭찬을 먹고 무럭무럭 자라납니다. 수업을 열심히 들어 ${charName}${eulRul} 성장시켜보아요!`;
+    `${charName}${iNun} 칭찬을 먹고 무럭무럭 자라납니다. 수업을 열심히 들어 ${charName}${iRul} 성장시켜보아요!`;
 
   document.getElementById('stageName').textContent = stage.name;
   document.getElementById('charName').textContent = charName;
@@ -2943,17 +2943,27 @@ function givePraise() {
 
 function showLevelUp(stage) {
   const char = CHARACTERS[data.currentChar.type];
+  const charName = data.currentChar.name;
+  // 받침 있으면 "이가", 없으면 "가"
+  const iGa = getParticle(charName, '이가', '가');
   document.getElementById('modalTitle').textContent = `레벨 ${stage.level} 달성!`;
-  document.getElementById('modalDesc').textContent = `${data.currentChar.name}가 "${stage.name}" 단계로 성장했어요!`;
+  document.getElementById('modalDesc').textContent = `${charName}${iGa} "${stage.name}" 단계로 성장했어요!`;
   document.getElementById('modalChar').innerHTML = getCharacterSVG(data.currentChar.type, stage.level, 'lvl');
-  document.getElementById('levelUpModal').classList.add('show');
+  const modal = document.getElementById('levelUpModal');
+  modal.classList.add('show');
+  // 칭찬 버튼이 가지고 있던 포커스를 닫기 버튼으로 옮김 (엔터로 다른 버튼이 눌리지 않게)
+  setTimeout(() => {
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    if (closeBtn) closeBtn.focus();
+  }, 50);
 }
 
 function showCompletion() {
   const charName = data.currentChar.name;
-  const eulRul = getParticle(charName, '을', '를');
+  // 받침 있으면 "이를", 없으면 "를"
+  const iRul = getParticle(charName, '이를', '를');
   document.getElementById('completionDesc').textContent =
-    `${charName}${eulRul} 완전히 키워냈어요!`;
+    `${charName}${iRul} 완전히 키워냈어요!`;
   document.getElementById('completedCharSvg').innerHTML =
     getCharacterSVG(data.currentChar.type, 5, 'complete');
 
@@ -2962,7 +2972,13 @@ function showCompletion() {
     setTimeout(() => spawnParticles(), i * 50);
   }
 
-  document.getElementById('completionModal').classList.add('show');
+  const modal = document.getElementById('completionModal');
+  modal.classList.add('show');
+  // 칭찬 버튼이 가지고 있던 포커스를 모달 버튼으로 옮김
+  setTimeout(() => {
+    const closeBtn = modal.querySelector('.modal-close-btn');
+    if (closeBtn) closeBtn.focus();
+  }, 50);
 }
 
 function afterCompletion() {
@@ -3091,11 +3107,14 @@ function openCharSelect(canClose) {
 function pickCharacter(type) {
   const char = CHARACTERS[type];
   const defaultName = '무럭이';
-  const name = prompt(`${char.eggLabel}을 골랐어요! 🥚\n이 알의 이름을 지어주세요 (안에 뭐가 있을지는 비밀!)`, defaultName) || defaultName;
+  const result = prompt(`${char.eggLabel}을 골랐어요! 🥚\n이 알의 이름을 지어주세요 (안에 뭐가 있을지는 비밀!)`, defaultName);
+  // 취소 누른 경우 (null) 캐릭터 선택을 취소
+  if (result === null) return;
+  const name = result.trim() || defaultName;
 
   data.currentChar = {
     type: type,
-    name: name.trim() || defaultName,
+    name: name,
     points: 0
   };
   saveData(data);

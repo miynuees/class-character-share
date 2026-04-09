@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>우리 반 캐릭터 키우기 🌱</title>
+<title>칭찬 캐릭터 키우기 🌱</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4FB585">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1467,7 +1467,7 @@ body {
 <body>
 
 <div class="header">
-  <h1 id="headerTitle">🌟 캐릭터 키우기</h1>
+  <h1 id="headerTitle">🌟 칭찬 캐릭터 키우기</h1>
   <p id="headerDesc">알을 깨우고 캐릭터를 성장시켜보세요!</p>
   <div class="header-buttons">
     <button class="header-btn" onclick="openHallOfFame()" title="명예의 전당">🏆</button>
@@ -2708,7 +2708,7 @@ function renderCharacterSVG(charType, level) {
 function updateDisplay() {
   // No current character → show character selection
   if (!data.currentChar) {
-    document.getElementById('headerTitle').textContent = '🌟 캐릭터 키우기';
+    document.getElementById('headerTitle').textContent = '🌟 칭찬 캐릭터 키우기';
     document.getElementById('headerDesc').textContent = '알을 깨우고 캐릭터를 성장시켜보세요!';
     openCharSelect(false);
     return;
